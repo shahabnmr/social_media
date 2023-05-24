@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smauth
+  template:
+    metadata:
+      labels:
+        app: smauth
+    spec:
+      containers:
+        - name: smauth
+          image: social_media/auth:0.1
+          env:
+            - name: NODE_ENV
+              value: 'dev'
+            - name: PORT
+              value: '3000'
+            - name: USER_PG
+              value: 'postgres'
+            - name: HOST_PG
+              value: 'auth-psql-srv'
+            - name: PORT_PG
+              value: '5432'
+            - name: DB_PG
+              value: 'social_media'
+            - name: PSQL_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: psql-pass
+                  key: PSQL_PASS
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret-social-media
+                  key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smauth-srv
+spec:
+  selector:
+    app: smauth
+  ports:
+    - name: smauth
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

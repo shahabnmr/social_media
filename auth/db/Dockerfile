@@ -1,0 +1,4 @@
+FROM postgres
+ENV POSTGRES_PASSWORD 123.
+ENV POSTGRES_DB social_media
+COPY .pgpass ~/
