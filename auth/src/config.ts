@@ -15,6 +15,9 @@ interface ENV {
 	JWT_KEY: string | undefined;
 	CRYPT_PASSWORD: string | undefined;
 	IV: string | undefined;
+	NATS_CLIENT_ID: string | undefined;
+	NATS_URL: string | undefined;
+	NATS_CLUSTER_ID: string | undefined;
 }
 
 interface Config {
@@ -28,6 +31,9 @@ interface Config {
 	JWT_KEY: string;
 	CRYPT_PASSWORD: string;
 	IV: string;
+	NATS_CLIENT_ID: string;
+	NATS_URL: string;
+	NATS_CLUSTER_ID: string;
 }
 
 // Loading process.env as ENV interface
@@ -35,7 +41,11 @@ interface Config {
 const getConfig = (): ENV => {
 	const options = yargs(process.argv)
 		.option('p', { alias: 'port', describe: 'port for app', type: 'number' })
-		.option('u', { alias: 'username', describe: 'username for connecting to postgres', type: 'string' })
+		.option('u', {
+			alias: 'username',
+			describe: 'username for connecting to postgres',
+			type: 'string',
+		})
 		.option('s', { alias: 'secret', describe: 'password to connect to postgres', type: 'string' })
 		.option('h', { alias: 'hostpsql', describe: 'host for postgres', type: 'string' })
 		.option('q', { alias: 'portpsql', describe: 'port for postgres', type: 'number' })
@@ -57,6 +67,9 @@ const getConfig = (): ENV => {
 			JWT_KEY: options.j,
 			CRYPT_PASSWORD: options.c,
 			IV: options.i,
+			NATS_CLIENT_ID: process.env.NATS_CLIENT_ID,
+			NATS_CLUSTER_ID: process.env.NATS_CLUSTER_ID,
+			NATS_URL: process.env.NATS_URL,
 		};
 	}
 	return {
@@ -70,6 +83,9 @@ const getConfig = (): ENV => {
 		JWT_KEY: process.env.JWT_KEY,
 		CRYPT_PASSWORD: process.env.CRYPT_PASSWORD,
 		IV: process.env.IV,
+		NATS_CLIENT_ID: process.env.NATS_CLIENT_ID,
+		NATS_CLUSTER_ID: process.env.NATS_CLUSTER_ID,
+		NATS_URL: process.env.NATS_URL,
 	};
 };
 

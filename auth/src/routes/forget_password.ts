@@ -5,6 +5,8 @@ import { BadRequestError, validateRequest } from '@sn_common/common';
 
 import { UserService } from '../services/db/psql/user';
 import sanitizedConfig from '../config';
+import { natsWrapper } from '../nats-wrapper';
+import { ForgetPasswordPublisher } from '../events/publisher/forger-password';
 
 const router = express.Router();
 
@@ -26,6 +28,12 @@ router.post(
 		const resetLink = `http://localhost:3000/api/v1/auth/reset-password/${token}`;
 
 		// send email with service that link
+		new ForgetPasswordPublisher(natsWrapper.client).publish({
+			email,
+			name: user.name,
+			family: user.family,
+			link: resetLink,
+		});
 
 		res.status(200).send({ token_: token });
 	},
