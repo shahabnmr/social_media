@@ -43,6 +43,6 @@ sleep 1;
 echo "insert data to tables"
 # psql -h localhost -p ${PORT_PSQL} -U postgres -f ./test/auth-insert-to-features.sql
 
-docker volume prune -f
+# docker volume prune -f
 
 echo "done"

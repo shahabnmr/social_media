@@ -2,7 +2,11 @@ import path from 'path';
 import dotenv from 'dotenv';
 import yargs from 'yargs';
 
-dotenv.config({ path: path.resolve(__dirname, '../config/.env') });
+if (process.env.NODE_ENV !== 'test') {
+	dotenv.config({ path: path.resolve(__dirname, '../config/.env') });
+} else {
+	dotenv.config({ path: path.resolve(__dirname, '../config/test.env') });
+}
 
 interface ENV {
 	NODE_ENV: string | undefined;
@@ -72,6 +76,7 @@ const getConfig = (): ENV => {
 			NATS_URL: process.env.NATS_URL,
 		};
 	}
+
 	return {
 		NODE_ENV: process.env.NODE_ENV,
 		PORT: process.env.PORT ? Number(process.env.PORT) : undefined,

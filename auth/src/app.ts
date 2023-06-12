@@ -16,6 +16,7 @@ import { forgetPasswordRouter } from './routes/forget_password';
 import { resetPasswordRouter } from './routes/reset_password';
 import { getProfileRouter } from './routes/get_profiel';
 import { updateProfileRouter } from './routes/update_profile';
+import { resendOtp } from './routes/resend_otp';
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use(forgetPasswordRouter);
 app.use(resetPasswordRouter);
 app.use(getProfileRouter);
 app.use(updateProfileRouter);
+app.use(resendOtp);
 
 app.all('*', async (req, res) => {
 	throw new NotFoundError();

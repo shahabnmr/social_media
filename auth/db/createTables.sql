@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS auth.user
     password text,
     createddate timestamp with time zone NOT NULL DEFAULT now(),
     updateddate timestamp with time zone NOT NULL DEFAULT now(),
+    version integer DEFAULT 0,
     CONSTRAINT user_pkey PRIMARY KEY (id),
     CONSTRAINT user_email UNIQUE (email),
     CONSTRAINT user_tell UNIQUE (tell)
@@ -103,6 +104,20 @@ AS $$
     WHERE userId=id_ AND active is null
 $$;
 
+CREATE OR REPLACE PROCEDURE delete_otp_id(id_ text)
+LANGUAGE SQL
+AS $$
+    DELETE FROM auth.otp
+    WHERE id=id_
+$$;
+
+CREATE OR REPLACE PROCEDURE delete_user(email_ text)
+LANGUAGE SQL
+AS $$
+    DELETE FROM auth.user
+    WHERE email=email_
+$$;
+
 CREATE OR REPLACE FUNCTION findOne_user(email_ text, tell_ text, id_ text)
   RETURNS SETOF auth.user
 AS
@@ -123,12 +138,12 @@ $$
 $$
 language sql;
 
-CREATE OR REPLACE FUNCTION findOne_otp(id_ text)
+CREATE OR REPLACE FUNCTION findOne_otp(id_ text, userid_ text)
   RETURNS SETOF auth.otp
 AS
 $$
     SELECT * 
     FROM auth.otp 
-    WHERE id=id_ LIMIT 1;
+    WHERE id=id_ OR userid=userid_ LIMIT 1;
 $$
 language sql;

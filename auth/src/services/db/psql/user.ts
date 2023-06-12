@@ -102,8 +102,8 @@ export class UserService {
 		return id;
 	}
 
-	async findOneOtp(id: string): Promise<Otp> {
-		const result = await this.client.query('select * from findOne_otp($1)', [id]);
+	async findOneOtp(id: string, userId: string): Promise<Otp> {
+		const result = await this.client.query('select * from findOne_otp($1,$2)', [id, userId]);
 		return result.rows[0];
 	}
 
@@ -117,5 +117,13 @@ export class UserService {
 		const result = await this.client.query('CALL delete_otp($1)', [id]);
 
 		return result;
+	}
+
+	async deleteUser(email: string) {
+		await this.client.query('CALL delete_user($1)', [email]);
+	}
+
+	async deleteOtp(id: string) {
+		await this.client.query('CALL delete_otp_id($1)', [id]);
 	}
 }

@@ -6,6 +6,8 @@ import { BadRequestError } from '@sn_common/common';
 import { UserService } from '../services/db/psql/user';
 import sanitizedConfig from '../config';
 import { dates } from '../services/dates/dates';
+import { SignInPublisher } from '../events/publisher/signin';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
@@ -22,7 +24,7 @@ router.post('/api/v1/auth/verify/', async (req: Request, res: Response) => {
 	if (!details) throw new BadRequestError('bad request');
 	const decoded = JSON.parse(await decode(details));
 
-	const otp_instance = await userService.findOneOtp(decoded.otp_id);
+	const otp_instance = await userService.findOneOtp(decoded.otp_id, '');
 
 	if (otp_instance != null) {
 		if (otp_instance.active != true) {
@@ -41,6 +43,8 @@ router.post('/api/v1/auth/verify/', async (req: Request, res: Response) => {
 					);
 
 					Object.assign(req.session, { jwt: userJwt });
+
+					new SignInPublisher(natsWrapper.client).publish({ email: user.email });
 
 					res.status(200).send({ user: user.id });
 				} else {

@@ -46,8 +46,6 @@ router.post(
 
 		const encoded = await encode(JSON.stringify(details));
 
-		// send otp with email to user in nats by email service
-
 		req.session = { details: encoded };
 
 		res.status(200).send({ user: existingUser.id });
