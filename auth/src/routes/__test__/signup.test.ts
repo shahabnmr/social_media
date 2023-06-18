@@ -12,7 +12,7 @@ afterEach(async () => {
 
 	if (user) {
 		const otp = await userService.findOneOtp('', user.id);
-		await userService.deleteOtp(otp.id);
+		otp ? await userService.deleteOtp(otp.id) : '';
 		await userService.deleteUser(email);
 	}
 });

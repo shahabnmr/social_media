@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { app } from '../app';
 import request from 'supertest';
-import { UserService } from '../services/db/psql/user';
+import { UserService } from '../services/db/psql/product';
 
 jest.mock('../nats-wrapper');
 jest.setTimeout(601999);

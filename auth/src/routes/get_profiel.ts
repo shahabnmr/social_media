@@ -7,7 +7,9 @@ const router = express.Router();
 
 router.get('/api/v1/auth/profile', currentUser, async (req: Request, res: Response) => {
 	const userService = await UserService.getInstance();
-	const userId = req.currentUser!.id;
+
+	if (!req.currentUser) throw new BadRequestError('you must signin firstly');
+	const userId = req.currentUser.id;
 
 	const user = await userService.findOne('', '', userId);
 

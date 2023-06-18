@@ -20,10 +20,8 @@ router.post('/api/v1/auth/signout', currentUser, async (req: Request, res: Respo
 	const result = await user.findOne(currentUser!.email, '', '');
 	if (!result) throw new BadRequestError('user not found!');
 
-	const userService = await UserService.getInstance();
-
 	const decoded = JSON.parse(await decode(details));
-	await userService.updateOtp(decoded.otp_id, false);
+	await user.updateOtp(decoded.otp_id, false);
 	req.session = null;
 
 	new SignOutPublisher(natsWrapper.client).publish({ email: currentUser!.email });

@@ -5,6 +5,7 @@ import { currentUser } from '@sn_common/common';
 const router = express.Router();
 
 router.get('/api/v1/auth/currentuser', currentUser, (req, res) => {
+
 	res.send({ currentUser: req.currentUser || null });
 });
 
