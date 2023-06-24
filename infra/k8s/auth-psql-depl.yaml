@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-psql-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-psql
+  template:
+    metadata:
+      labels:
+        app: auth-psql
+    spec:
+      containers:
+        - name: auth-psql
+          image: auth-postgres:0.1
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: auth-psql-pv-claim
+      volumes:
+        - name: auth-psql-pv-claim
+          persistentVolumeClaim:
+            claimName: auth-psql-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-psql-srv
+spec:
+  selector:
+    app: auth-psql
+  ports:
+    - name: db
+      protocol: TCP
+      port: 5432
+      targetPort: 5432

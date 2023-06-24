@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-psql-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-psql
+  template:
+    metadata:
+      labels:
+        app: product-psql
+    spec:
+      containers:
+        - name: product-psql
+          image: product-postgres:0.1
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: product-psql-pv-claim
+      volumes:
+        - name: product-psql-pv-claim
+          persistentVolumeClaim:
+            claimName: product-psql-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-psql-srv
+spec:
+  selector:
+    app: product-psql
+  ports:
+    - name: db
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
