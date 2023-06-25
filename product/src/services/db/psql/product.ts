@@ -16,6 +16,7 @@ export interface Product {
 	version?: number;
 	colors: Color[];
 	sub_category_id: string;
+	brandId: string;
 	fields: { fieldId: string; value: string }[] | string;
 }
 
@@ -50,13 +51,14 @@ export class ProductService {
 
 	async insertProduct(product: Product): Promise<string> {
 		product.id = uuidv4();
-		await this.client.query('CALL insert_product($1,$2,$3,$4,$5,$6)', [
+		await this.client.query('CALL insert_product($1,$2,$3,$4,$5,$6,$7)', [
 			product.id,
 			product.name,
 			product.description,
 			product.images,
 			product.price,
 			product.sub_category_id,
+			product.brandId,
 		]);
 		return product.id;
 	}

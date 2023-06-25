@@ -38,13 +38,13 @@ sleep 1;
 
 echo "create tables"
 psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_field.sql
-# psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_brand.sql
+psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_brand.sql
 psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_category.sql
 psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_sub_category.sql
 psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_color.sql
 psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_product.sql
 psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_product_color.sql
-# psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_brand_sub_category.sql
+psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_brand_sub_category.sql
 psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_sub_category_field.sql
 psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createTable_value_product_field.sql
 sleep 1;

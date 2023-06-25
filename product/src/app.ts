@@ -18,6 +18,9 @@ import { insertFieldRouter } from './routes/insert_field';
 import { getFieldsRouter } from './routes/get_fields';
 import { insertFieldsForSubCategory } from './routes/insert_fieldsForSub_category';
 import { getFieldsOfSubCategoryRouter } from './routes/get_field_Of_subCategory';
+import { insertBrandRouter } from './routes/insert_brand';
+import { getBrandsRouter } from './routes/get_brands';
+import { insertBrandstoSubCategoryRouter } from './routes/insert_brand_to_subCategory';
 
 const app = express();
 
@@ -54,6 +57,9 @@ app.use(insertFieldRouter);
 app.use(getFieldsRouter);
 app.use(insertFieldsForSubCategory);
 app.use(getFieldsOfSubCategoryRouter);
+app.use(insertBrandRouter);
+app.use(getBrandsRouter);
+app.use(insertBrandstoSubCategoryRouter);
 
 app.all('*', async (req, res) => {
 	throw new NotFoundError();

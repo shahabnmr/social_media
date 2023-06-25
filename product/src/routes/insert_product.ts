@@ -4,6 +4,7 @@ import { BadRequestError, validateRequest } from '@sn_common/common';
 
 import { Product, ProductService } from '../services/db/psql/product';
 import { SubCategoryService } from '../services/db/psql/sub_category';
+import { BrandService } from '../services/db/psql/brand';
 
 const router = express.Router();
 
@@ -27,21 +28,27 @@ router.post(
 			.not()
 			.isEmpty()
 			.withMessage('fields.fieldId is not valid'),
+		body('brandId').isUUID().withMessage('brandId is not valid'),
 	],
 	validateRequest,
 	async (req: Request, res: Response) => {
 		let product: Product = req.body;
 		const productService = await ProductService.getInstance();
 		const subCategoryService = await SubCategoryService.getInstance();
+		const brandService = await BrandService.getInstance();
 
-		const lengthOfFields = product.fields.length;
+		const brand = await brandService.findOneBrandInSubCategory(
+			product.sub_category_id,
+			product.brandId,
+		);
+
+		if (!brand) throw new BadRequestError('this subCategory not have this brand');
+
 		let fields = JSON.stringify(product.fields);
 		const checkFieldsOfSubCategory = await subCategoryService.checkFieldsOfSubCategory(
 			product.sub_category_id,
 			fields,
 		);
-		if (checkFieldsOfSubCategory.length !== lengthOfFields)
-			throw new BadRequestError('one or many of fields is not for this sub_category');
 
 		const fieldOfSubCategory = await subCategoryService.findFieldsOfSubCategory(
 			product.sub_category_id,
@@ -49,8 +56,6 @@ router.post(
 		);
 
 		fieldOfSubCategory.map((field) => {
-			console.log(field);
-
 			if (!fields.includes(field.id!))
 				throw new BadRequestError(`this field must be provide id:${field.id}, name:${field.name}`);
 		});

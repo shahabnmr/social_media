@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS product.value_product_field
     version integer DEFAULT 0,
     createddate timestamp with time zone NOT NULL DEFAULT now(),
     updateddate timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT value_product_field_pkey PRIMARY KEY (id),
+    CONSTRAINT value_product_field_pkey PRIMARY KEY (field_id,product_id),
     CONSTRAINT fk_fieldId FOREIGN KEY(field_id) REFERENCES product.field(id),
     CONSTRAINT fk_productId FOREIGN KEY(product_id) REFERENCES product.product(id)
 );

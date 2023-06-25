@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS product.sub_category_field
     version integer DEFAULT 0,
     createddate timestamp with time zone NOT NULL DEFAULT now(),
     updateddate timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT sub_category_field_pkey PRIMARY KEY (id),
+    CONSTRAINT sub_category_field_pkey PRIMARY KEY (sub_category_id,field_id),
     CONSTRAINT fk_sub_categoryId FOREIGN KEY(sub_category_id) REFERENCES product.sub_category(id),
     CONSTRAINT fk_fieldId FOREIGN KEY(field_id) REFERENCES product.field(id)
 );

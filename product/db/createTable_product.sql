@@ -12,11 +12,11 @@ CREATE TABLE IF NOT EXISTS product.product
     version integer DEFAULT 0,
     sub_category_id text NOT NULL,
     price text NOT NULL,
-    -- brand text NOT NULL,
+    brand text NOT NULL,
     CONSTRAINT product_pkey PRIMARY KEY (id),
     CONSTRAINT product_name UNIQUE (name),
-    CONSTRAINT fk_sub_categoryId FOREIGN KEY(sub_category_id) REFERENCES product.sub_category(id)
-    -- CONSTRAINT fk_brandId FOREIGN KEY(brand) REFERENCES product.brand(id)
+    CONSTRAINT fk_sub_categoryId FOREIGN KEY(sub_category_id) REFERENCES product.sub_category(id),
+    CONSTRAINT fk_brandId FOREIGN KEY(brand) REFERENCES product.brand(id)
 );
 
 CREATE OR REPLACE TRIGGER updated_timestamp_product
@@ -27,12 +27,12 @@ CREATE OR REPLACE TRIGGER updated_timestamp_product
 EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE OR REPLACE PROCEDURE insert_product(
-    id_ text, name_ text, description_ text,images_ text[], price_ text,sub_category_id_ text
+    id_ text, name_ text, description_ text,images_ text[], price_ text,sub_category_id_ text,brandId text
     )
 LANGUAGE SQL
 AS $$
-    INSERT INTO product.product(id,name,description,images,price,sub_category_id) 
-    VALUES (id_, name_, description_,images_,price_,sub_category_id_)
+    INSERT INTO product.product(id,name,description,images,price,sub_category_id,brand) 
+    VALUES (id_, name_, description_,images_,price_,sub_category_id_,brandId)
 $$;
 
 CREATE OR REPLACE FUNCTION findOneProduct(id_ text, name_ text)

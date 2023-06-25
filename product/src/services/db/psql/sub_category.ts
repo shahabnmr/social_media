@@ -127,7 +127,6 @@ export class SubCategoryService {
 			subCategoryId,
 			fields,
 		]);
-		console.log(result.rows.length);
 
 		return result.rows;
 	}
