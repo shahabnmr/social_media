@@ -12,6 +12,15 @@ import { insertColorRouter } from './routes/insert_color';
 import { insertProductRouter } from './routes/insert_product';
 import { colorOfProductRouter } from './routes/insert_product_color';
 import { getProductRouter } from './routes/get_product';
+import { insertSubCategoryRouter } from './routes/insert_sub_category';
+import { getSubCategoriesOfCategory } from './routes/get_sub_category_of_categories';
+import { insertFieldRouter } from './routes/insert_field';
+import { getFieldsRouter } from './routes/get_fields';
+import { insertFieldsForSubCategory } from './routes/insert_fieldsForSub_category';
+import { getFieldsOfSubCategoryRouter } from './routes/get_field_Of_subCategory';
+import { insertBrandRouter } from './routes/insert_brand';
+import { getBrandsRouter } from './routes/get_brands';
+import { insertBrandstoSubCategoryRouter } from './routes/insert_brand_to_subCategory';
 
 const app = express();
 
@@ -42,6 +51,15 @@ app.use(insertColorRouter);
 app.use(insertProductRouter);
 app.use(colorOfProductRouter);
 app.use(getProductRouter);
+app.use(insertSubCategoryRouter);
+app.use(getSubCategoriesOfCategory);
+app.use(insertFieldRouter);
+app.use(getFieldsRouter);
+app.use(insertFieldsForSubCategory);
+app.use(getFieldsOfSubCategoryRouter);
+app.use(insertBrandRouter);
+app.use(getBrandsRouter);
+app.use(insertBrandstoSubCategoryRouter);
 
 app.all('*', async (req, res) => {
 	throw new NotFoundError();

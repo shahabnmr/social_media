@@ -27,3 +27,29 @@ CREATE OR REPLACE TRIGGER updated_timestamp_field
 		product.field
     FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE OR REPLACE PROCEDURE insert_field(id_ text, name_ text, type_ text, metadata_ text)
+LANGUAGE SQL
+AS $$
+    INSERT INTO product.field(id,name,type,metadata) 
+    VALUES (id_, name_, type_,metadata_)
+$$;
+
+CREATE OR REPLACE FUNCTION findOneField(id_ text, name_ text)
+  RETURNS SETOF product.field
+AS
+$$
+    SELECT *
+    FROM product.field 
+    WHERE id=id_ OR name=name_ LIMIT 1;
+$$
+language sql;
+
+CREATE OR REPLACE FUNCTION findFields()
+  RETURNS SETOF product.field
+AS
+$$
+    SELECT *
+    FROM product.field;
+$$
+language sql;

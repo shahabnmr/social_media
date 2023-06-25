@@ -2,6 +2,8 @@ import Dbservice from '../common/postgres/db.service';
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseConnectionError, NotFoundError } from '@sn_common/common';
 import { Color } from './color';
+import util from 'util';
+import { SubCategory } from './sub_category';
 
 export interface Product {
 	id?: string;
@@ -13,6 +15,9 @@ export interface Product {
 	price: string;
 	version?: number;
 	colors: Color[];
+	sub_category_id: string;
+	brandId: string;
+	fields: { fieldId: string; value: string }[] | string;
 }
 
 export class ProductService {
@@ -46,12 +51,14 @@ export class ProductService {
 
 	async insertProduct(product: Product): Promise<string> {
 		product.id = uuidv4();
-		await this.client.query('CALL insert_product($1,$2,$3,$4,$5)', [
+		await this.client.query('CALL insert_product($1,$2,$3,$4,$5,$6,$7)', [
 			product.id,
 			product.name,
 			product.description,
 			product.images,
 			product.price,
+			product.sub_category_id,
+			product.brandId,
 		]);
 		return product.id;
 	}
@@ -73,5 +80,17 @@ export class ProductService {
 		]);
 
 		return result.rows[0];
+	}
+
+	async insertValuesOfFields(product: Product): Promise<string> {
+		const fields = JSON.stringify(product.fields);
+
+		await this.client.query('CALL insert_fieldsOfProduct($1,$2,$3)', [
+			product.id,
+			fields,
+			product.sub_category_id,
+		]);
+
+		return 'inserts done';
 	}
 }
