@@ -5,6 +5,9 @@ import cors from 'cors';
 import cookieSession from 'cookie-session';
 import { errorHandler, NotFoundError } from '@sn_common/common';
 import { rateLimit } from 'express-rate-limit';
+import multer from 'multer';
+import { v4 as uuidv4 } from 'uuid';
+import path from 'path';
 
 import Dbservice from './services/db/common/postgres/db.service';
 import { insertCategoryRouter } from './routes/insert_category';
@@ -21,6 +24,7 @@ import { getFieldsOfSubCategoryRouter } from './routes/get_field_Of_subCategory'
 import { insertBrandRouter } from './routes/insert_brand';
 import { getBrandsRouter } from './routes/get_brands';
 import { insertBrandstoSubCategoryRouter } from './routes/insert_brand_to_subCategory';
+import { checkFileType } from './services/multer/checkFileType';
 
 const app = express();
 
@@ -29,7 +33,26 @@ const limiter = rateLimit({
 	max: 50,
 	message: 'too many request from this IP, pls try again after in a few minutes ',
 });
+
+app.use('/images', express.static(path.join(__dirname, 'public')));
+
+const storageEngine = multer.diskStorage({
+	destination: './src/public',
+	filename: (req, file, cd) => {
+		cd(null, `${uuidv4()}_${Date.now()}_${file.originalname}`);
+	},
+});
+
+const upload = multer({
+	storage: storageEngine,
+	limits: { fileSize: 8000000 },
+	fileFilter: (req, file, cb) => {
+		checkFileType(file, cb);
+	},
+});
+
 // app.set('trust proxy', true);
+
 app.use(json());
 app.use(cors());
 app.use(
@@ -48,7 +71,7 @@ connections();
 
 app.use(insertCategoryRouter);
 app.use(insertColorRouter);
-app.use(insertProductRouter);
+app.use(upload.array('images', 5), insertProductRouter);
 app.use(colorOfProductRouter);
 app.use(getProductRouter);
 app.use(insertSubCategoryRouter);
