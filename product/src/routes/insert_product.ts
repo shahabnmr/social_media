@@ -13,7 +13,6 @@ router.post(
 	[
 		body('name').isString().isLength({ min: 5, max: 25 }).withMessage('name is not valid'),
 		body('description').isString().withMessage('description is not valid'),
-		body('images').isArray().withMessage('images is not valid'),
 		body('price').isString().isLength({ max: 10, min: 1 }).withMessage('price is not valid'),
 		body('sub_category_id').isUUID().withMessage('sub_category_id is not valid'),
 		body('fields.*.fieldId')
@@ -33,6 +32,11 @@ router.post(
 	validateRequest,
 	async (req: Request, res: Response) => {
 		let product: Product = req.body;
+
+		product.images = (req.files as Array<Express.Multer.File>).map((image) => {
+			return image.filename;
+		});
+
 		const productService = await ProductService.getInstance();
 		const subCategoryService = await SubCategoryService.getInstance();
 		const brandService = await BrandService.getInstance();
