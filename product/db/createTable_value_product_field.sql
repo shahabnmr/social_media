@@ -46,3 +46,41 @@ $$
 		WHERE sub_category_id=sub_category_id_ and field_id=datajson->>'fieldId';
 $$
 language sql;
+
+CREATE OR REPLACE FUNCTION findOneProductAllInfo(product_id_ text, name_ text)
+  RETURNS  TABLE(
+	  id text,
+	  name text,
+	  description text,
+	  price text,
+	  images text[], 
+	  colors text,
+	  fields text,
+	  brand text,
+  	  sub_category text
+  )
+AS
+$$
+SELECT id,p.name,p.description,p.price,p.images,c.colors,f.fields,b.brand,sc.sub_category
+FROM product.product p,
+	LATERAL (
+		SELECT json_agg(json_build_object('id',c.id,'name',c.name,'code_color',c.code_color,'amount',pc.amount)) as colors
+		FROM product.color c
+		JOIN product.product_color pc ON c.id=pc.color_id
+		WHERE pc.product_id=p.id)c,
+	LATERAL (
+		SELECT json_agg(json_build_object('id',f.id,f.name,vpf.value)) AS fields
+		FROM product.field f
+		JOIN product.value_product_field vpf ON f.id=vpf.field_id
+		WHERE vpf.product_id=p.id)f,
+	LATERAL(
+		SELECT b.name AS brand 
+		FROM product.brand b 
+		JOIN product.product p ON p.brand=b.id)b,
+	LATERAL(
+		SELECT sc.name AS sub_category
+		FROM product.sub_category sc
+		JOIN product.product p ON p.sub_category_id=sc.id)sc
+WHERE p.id=product_id_ OR p.name=name_;
+$$
+language sql;
