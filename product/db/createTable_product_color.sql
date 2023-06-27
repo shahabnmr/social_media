@@ -39,18 +39,3 @@ $$
     WHERE color_id=color_id_ AND product_id=product_id_ LIMIT 1;
 $$
 language sql;
-
-CREATE OR REPLACE FUNCTION findOneProductAllInfo(product_id_ text, name_ text)
-  RETURNS  table(id text,name text, description text, price text, colors text)
-AS
-$$
-select id,p.name,p.description,p.price,c.colors
-from product.product p,LATERAL (
-		SELECT json_agg(json_build_object('id',c.id,'name',c.name,'code_color',c.code_color,'amount',pc.amount)) as colors
-		from product.color c
-		join product.product_color pc on c.id=pc.color_id
-		where pc.product_id=p.id
-)c
-where p.id=product_id_ OR p.name=name_;
-$$
-language sql;

@@ -64,17 +64,20 @@ export class ProductService {
 	}
 
 	async findOneProductAllInfo(productId: string, name: string): Promise<Product> {
-		let result = await this.client.query('select * from findOneProductAllInfo($1,$2)', [
+		let result = await this.client.query('SELECT * FROM findOneProductAllInfo($1,$2)', [
 			productId,
 			name,
 		]);
-		if (result.rows[0]) result.rows[0].colors = JSON.parse(result.rows[0].colors);
+		if (result.rows[0]) {
+			result.rows[0].colors = JSON.parse(result.rows[0].colors);
+			result.rows[0].fields = JSON.parse(result.rows[0].fields);
+		}
 
 		return result.rows[0];
 	}
 
 	async findOneProduct(productId: string, name: string): Promise<Product> {
-		let result = await this.client.query('select * from findOneProductAllInfo($1,$2)', [
+		let result = await this.client.query('SELECT * FROM findOneProductAllInfo($1,$2)', [
 			productId,
 			name,
 		]);
