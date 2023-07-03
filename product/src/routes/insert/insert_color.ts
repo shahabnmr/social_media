@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { BadRequestError, validateRequest } from '@sn_common/common';
 
-import { ColorService } from '../services/db/psql/color';
+import { ColorService } from '../../services/db/psql/color';
 const router = express.Router();
 
 router.post(

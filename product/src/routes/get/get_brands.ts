@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { BrandService } from '../services/db/psql/brand';
+import { BrandService } from '../../services/db/psql/brand';
 
 const router = express.Router();
 

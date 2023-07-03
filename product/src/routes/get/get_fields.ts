@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { SubCategoryService } from '../services/db/psql/sub_category';
+import { SubCategoryService } from '../../services/db/psql/sub_category';
 
 const router = express.Router();
 

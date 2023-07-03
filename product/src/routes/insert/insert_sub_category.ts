@@ -2,8 +2,8 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { BadRequestError, validateRequest } from '@sn_common/common';
 
-import { SubCategory, SubCategoryService } from '../services/db/psql/sub_category';
-import { CategoryService } from '../services/db/psql/category';
+import { SubCategory, SubCategoryService } from '../../services/db/psql/sub_category';
+import { CategoryService } from '../../services/db/psql/category';
 const router = express.Router();
 
 router.post(
@@ -12,11 +12,11 @@ router.post(
 		body('name')
 			.isString()
 			.isLength({ min: 3, max: 15 })
-			.withMessage('نام زیرگروه باید بین ۳ تا ۱۵ حروف باشد.'),
+			.withMessage('name have to be between 3 and 15 charecter'),
 		body('category_id')
 			.isString()
 			.isLength({ min: 36, max: 36 })
-			.withMessage('آیدی دسته بندی صحیح نمیباشد.'),
+			.withMessage('category_id is invalid'),
 	],
 	validateRequest,
 	async (req: Request, res: Response) => {
