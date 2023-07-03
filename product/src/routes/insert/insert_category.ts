@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { BadRequestError, validateRequest } from '@sn_common/common';
 
-import { CategoryService } from '../services/db/psql/category';
+import { CategoryService } from '../../services/db/psql/category';
 
 const router = express.Router();
 
@@ -18,7 +18,7 @@ router.post(
 		if (category) throw new BadRequestError(`this category name already exist: ${name}`);
 
 		const result = await categoryService.insert(name);
-		res.status(200).send({ category: result });
+		res.status(201).send({ category: result });
 	},
 );
 

@@ -2,14 +2,14 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { BadRequestError, validateRequest } from '@sn_common/common';
 
-import { Brand, BrandService } from '../services/db/psql/brand';
+import { Brand, BrandService } from '../../services/db/psql/brand';
 const router = express.Router();
 
 router.post(
 	'/api/v1/product/brand/insert/',
 	[
-		body('name').isString().not().isEmpty().withMessage('نام برند معتبر نمی باشد.'),
-		body('description').isString().withMessage('توضیحات وارد شده صحیح نمی باشد.'),
+		body('name').isString().not().isEmpty().withMessage('name is not valid'),
+		body('description').isString().withMessage('description is not valid'),
 	],
 	validateRequest,
 	async (req: Request, res: Response) => {

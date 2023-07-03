@@ -2,8 +2,8 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { BadRequestError, validateRequest } from '@sn_common/common';
 
-import { ColorService, ColorOfProduct } from '../services/db/psql/color';
-import { ProductService } from '../services/db/psql/product';
+import { ColorService, ColorOfProduct } from '../../services/db/psql/color';
+import { ProductService } from '../../services/db/psql/product';
 
 const router = express.Router();
 

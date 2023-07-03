@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { BadRequestError, validateRequest } from '@sn_common/common';
-import { Field, SubCategoryService } from '../services/db/psql/sub_category';
+import { Field, SubCategoryService } from '../../services/db/psql/sub_category';
 
 const router = express.Router();
 

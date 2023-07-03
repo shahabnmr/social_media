@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { SubCategoryService } from '../services/db/psql/sub_category';
+import { SubCategoryService } from '../../services/db/psql/sub_category';
 import { BadRequestError } from '@sn_common/common';
 
 const router = express.Router();
@@ -8,13 +8,13 @@ router.get('/api/v1/product/sub_category/fields/query/', async (req: Request, re
 	if (req.query.subCategoryId) {
 		const subCategoryId = req.query.subCategoryId as string;
 		if (subCategoryId.length > 36 || subCategoryId.length < 36)
-			throw new BadRequestError('آیدی زیرگروه معتبر نمیباشد.');
+			throw new BadRequestError('suc_category_id is invalid');
 	}
 
 	if (req.query.subCategoryName) {
 		const subCategoryName = req.query.subCategoryName as string;
 		if (subCategoryName.length > 15 || subCategoryName.length < 3)
-			throw new BadRequestError('نام دسته بندی معتبر نمی باشد.');
+			throw new BadRequestError('sub_category name is invalid');
 	}
 	const subCategoryService = await SubCategoryService.getInstance();
 	const result = await subCategoryService.findFieldsOfSubCategory(

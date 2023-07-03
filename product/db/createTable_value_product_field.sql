@@ -84,3 +84,20 @@ FROM product.product p,
 WHERE p.id=product_id_ OR p.name=name_;
 $$
 language sql;
+
+CREATE OR REPLACE PROCEDURE deleteAllContent()
+AS
+$$
+    TRUNCATE product.product,
+				product.category,
+				product.sub_category,
+				product.product_color,
+				product.value_product_field,
+				product.field,
+				product.brand,
+				product.brand_sub_category,
+				product.color,
+				product.sub_category_field
+		CASCADE;
+$$
+language sql;

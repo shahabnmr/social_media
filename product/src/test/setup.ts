@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { app } from '../app';
 import request from 'supertest';
-import { UserService } from '../services/db/psql/product';
+import { ProductService } from '../services/db/psql/product';
 
 jest.mock('../nats-wrapper');
 jest.setTimeout(601999);
@@ -15,41 +15,133 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+	const product = await ProductService.getInstance();
+	await product.deleteAllContent();
+
 	jest.clearAllMocks();
 });
 
-export const signin = async () => {
-	const userService = await UserService.getInstance();
-
-	const email = 'test@test.com';
-
-	const res = await request(app)
-		.post('/api/v1/auth/signup')
+export const insertCategory = async (name: string) => {
+	return await request(app)
+		.post('/api/v1/product/category/')
 		.send({
-			name: 'shahab',
-			family: 'asd',
-			tell: '01234567891',
-			email,
-			password: '123qwe',
-			confirmPassword: '123qwe',
+			name,
+		})
+		.expect(201);
+};
+
+export const insertSubCategory = async (nameSubCategory: string, nameCategory: string) => {
+	const category = await insertCategory(nameCategory);
+
+	return await request(app)
+		.post('/api/v1/product/sub_category')
+		.send({
+			name: nameSubCategory,
+			category_id: category.body.category,
+		})
+		.expect(201);
+};
+
+export const insertBrand = async (brandName: string) => {
+	return await request(app)
+		.post('/api/v1/product/brand/insert/')
+		.send({
+			name: brandName,
+			description: 'this is sony brand',
+		})
+		.expect(201);
+};
+
+export const insertField = async (nameField: string) => {
+	return await request(app)
+		.post('/api/v1/product/sub_category/field')
+		.send({
+			name: nameField,
+			type: 'text',
+			metadata: '',
+		})
+		.expect(201);
+};
+
+export const insertColor = async (nameColor: string) => {
+	return await request(app)
+		.post('/api/v1/product/color')
+		.send({
+			name: nameColor,
+			code_color: '#123456',
+		})
+		.expect(201);
+};
+
+export const insertFieldsSubCategory = async () => {
+	const field = await insertField('ram');
+	const subCategory = await insertSubCategory('laptop', 'electronics');
+	await request(app)
+		.post('/api/v1/product/sub_category/add-fields')
+		.send({
+			subCategory_id: subCategory.body.subCategoryId,
+			field_ids: [field.body.fieldId],
+		})
+		.expect(201);
+	return { subCategory, field };
+};
+
+export const insertProduct = async () => {
+	const { subCategory, field } = await insertFieldsSubCategory();
+	const brand = await insertBrand('sony');
+
+	await request(app)
+		.post('/api/v1/product/brand/insert/to_sub_category/')
+		.send({
+			sub_category_id: subCategory.body.subCategoryId,
+			brands: [brand.body.result],
 		})
 		.expect(201);
 
-	const details = res.get('Set-Cookie');
-
-	const user = await userService.findOne(email, '', '');
-	const otp = await userService.findOneOtp('', user.id);
-
-	const res2 = await request(app)
-		.post('/api/v1/auth/verify')
-		.set('Cookie', details)
+	return await request(app)
+		.post('/api/v1/product/')
 		.send({
-			otp: otp.otp,
-		})
-		.expect(200);
-	expect(res2.body.user).toBeDefined();
-
-	const cookie = res2.get('Set-Cookie');
-
-	return { cookie, details };
+			name: 'z5 laptop',
+			description: 'this is a good laptop',
+			price: '155',
+			sub_category_id: subCategory.body.subCategoryId,
+			fields: [{ fieldId: field.body.fieldId, value: '256' }],
+			brandId: brand.body.result,
+		});
 };
+
+// export const signin = async () => {
+// const userService = await UserService.getInstance();
+
+// const email = 'test@test.com';
+
+// const res = await request(app)
+// 	.post('/api/v1/auth/signup')
+// 	.send({
+// 		name: 'shahab',
+// 		family: 'asd',
+// 		tell: '01234567891',
+// 		email,
+// 		password: '123qwe',
+// 		confirmPassword: '123qwe',
+// 	})
+// 	.expect(201);
+
+// const details = res.get('Set-Cookie');
+
+// const user = await userService.findOne(email, '', '');
+// const otp = await userService.findOneOtp('', user.id);
+
+// const res2 = await request(app)
+// 	.post('/api/v1/auth/verify')
+// 	.set('Cookie', details)
+// 	.send({
+// 		otp: otp.otp,
+// 	})
+// 	.expect(200);
+// expect(res2.body.user).toBeDefined();
+
+// const cookie = res2.get('Set-Cookie');
+
+// return { cookie, details };
+// };

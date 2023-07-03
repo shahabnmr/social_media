@@ -96,4 +96,8 @@ export class ProductService {
 
 		return 'inserts done';
 	}
+
+	async deleteAllContent() {
+		await this.client.query('CALL deleteAllContent()');
+	}
 }

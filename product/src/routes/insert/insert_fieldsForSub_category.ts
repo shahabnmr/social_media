@@ -1,15 +1,20 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { BadRequestError, validateRequest } from '@sn_common/common';
-import { Field, FieldsForSubCategory, SubCategoryService } from '../services/db/psql/sub_category';
+import {
+	Field,
+	FieldsForSubCategory,
+	SubCategoryService,
+} from '../../services/db/psql/sub_category';
 
 const router = express.Router();
 
 router.post(
 	'/api/v1/product/sub_category/add-fields',
 	[
-		body('subCategory_id').isString().isUUID().withMessage('آیدی زیرگروه معتبر نمی باشد.'),
-		body('field_ids').isArray().withMessage('آیدی های فیلد معتبر نمیباشد'),
+		body('subCategory_id').isString().isUUID().withMessage('invalid subCategory_id'),
+		body('field_ids').isArray().withMessage('invalid field_ids'),
+		body('field_ids.*').isUUID().withMessage('invalid field_ids'),
 	],
 	validateRequest,
 	async (req: Request, res: Response) => {
