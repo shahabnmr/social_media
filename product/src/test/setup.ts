@@ -1,12 +1,28 @@
 import jwt from 'jsonwebtoken';
 import { app } from '../app';
 import request from 'supertest';
+import Dbservice from '../services/db/common/postgres/db.service';
 import { ProductService } from '../services/db/psql/product';
+import { BrandService } from '../services/db/psql/brand';
+import { CategoryService } from '../services/db/psql/category';
+import { ColorService } from '../services/db/psql/color';
+import { SubCategoryService } from '../services/db/psql/sub_category';
 
 jest.mock('../nats-wrapper');
 jest.setTimeout(601999);
+let category: any;
+let color: any;
+let subCategory: any;
+let product: any;
+let brand: any;
 
 beforeAll(async () => {
+	brand = await BrandService.getInstance();
+	category = await CategoryService.getInstance();
+	color = await ColorService.getInstance();
+	subCategory = await SubCategoryService.getInstance();
+	product = await ProductService.getInstance();
+
 	process.env.TZ = 'EST';
 	process.env.NATS_CLIENT_ID = 'dsadasdasas';
 	process.env.NATS_URL = 'string';
@@ -15,10 +31,17 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-	const product = await ProductService.getInstance();
 	await product.deleteAllContent();
 
 	jest.clearAllMocks();
+});
+
+afterAll(async () => {
+	await product.end();
+	await brand.end();
+	await category.end();
+	await color.end();
+	await subCategory.end();
 });
 
 export const insertCategory = async (name: string) => {

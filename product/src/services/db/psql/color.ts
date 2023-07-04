@@ -80,4 +80,8 @@ export class ColorService {
 		]);
 		return color.rows[0];
 	}
+
+	async end() {
+		await this.client.end();
+	}
 }
