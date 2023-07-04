@@ -130,4 +130,8 @@ export class SubCategoryService {
 
 		return result.rows;
 	}
+
+	async end() {
+		await this.client.end();
+	}
 }

@@ -91,4 +91,8 @@ export class BrandService {
 		const result = await this.client.query('SELECT * FROM checkBrands($1)', [brands]);
 		return result.rows[0].checkbrands;
 	}
+
+	async end() {
+		await this.client.end();
+	}
 }

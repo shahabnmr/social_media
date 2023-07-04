@@ -1,9 +1,7 @@
 import Dbservice from '../common/postgres/db.service';
 import { v4 as uuidv4 } from 'uuid';
-import { DatabaseConnectionError, NotFoundError } from '@sn_common/common';
+import { DatabaseConnectionError } from '@sn_common/common';
 import { Color } from './color';
-import util from 'util';
-import { SubCategory } from './sub_category';
 
 export interface Product {
 	id?: string;
@@ -99,5 +97,8 @@ export class ProductService {
 
 	async deleteAllContent() {
 		await this.client.query('CALL deleteAllContent()');
+	}
+	async end() {
+		await this.client.end();
 	}
 }

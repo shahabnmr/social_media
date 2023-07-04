@@ -4,7 +4,7 @@ import { SubCategoryService } from '../../services/db/psql/sub_category';
 const router = express.Router();
 
 router.get(
-	'/api/v1/product/sub_category/:categoryId/:name',
+	'/api/v1/product/get_sub_category/:categoryId/:name',
 	async (req: Request, res: Response) => {
 		const { categoryId, name } = req.params;
 		const subCategoryService = await SubCategoryService.getInstance();

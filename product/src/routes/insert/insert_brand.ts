@@ -16,7 +16,7 @@ router.post(
 		const brand: Brand = req.body;
 		const brandService = await BrandService.getInstance();
 		const brandExist = await brandService.findOne('', brand.name);
-		if (brandExist) throw new BadRequestError('این نام برند قبلا ثبت شده است.');
+		if (brandExist) throw new BadRequestError('this brand name already exist.');
 
 		const result = await brandService.insert(brand);
 
