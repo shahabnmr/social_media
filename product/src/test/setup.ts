@@ -133,6 +133,22 @@ export const insertProduct = async () => {
 		});
 };
 
+export const insertBrandToSubCategory = async () => {
+	const subCategory = await insertSubCategory('laptop', 'electronics');
+
+	const brand = await insertBrand('sony');
+
+	await request(app)
+		.post('/api/v1/product/brand/insert/to_sub_category/')
+		.send({
+			sub_category_id: subCategory.body.subCategoryId,
+			brands: [brand.body.result],
+		})
+		.expect(201);
+
+	return subCategory.body.subCategoryId;
+};
+
 // export const signin = async () => {
 // const userService = await UserService.getInstance();
 
