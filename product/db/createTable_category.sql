@@ -36,3 +36,12 @@ $$
     WHERE id=id_ OR name=name_ LIMIT 1;
 $$
 language sql;
+
+CREATE OR REPLACE FUNCTION findCategories()
+  RETURNS SETOF product.category
+AS
+$$
+    SELECT *
+    FROM product.category;
+$$
+language sql;

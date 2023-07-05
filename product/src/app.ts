@@ -25,6 +25,7 @@ import { insertBrandRouter } from './routes/insert/insert_brand';
 import { getBrandsRouter } from './routes/get/get_brands';
 import { insertBrandstoSubCategoryRouter } from './routes/insert/insert_brand_to_subCategory';
 import { checkFileType } from './services/multer/checkFileType';
+import { getAllcategoriesRouter } from './routes/get/get_categories';
 
 const app = express();
 
@@ -83,6 +84,7 @@ app.use(getFieldsOfSubCategoryRouter);
 app.use(insertBrandRouter);
 app.use(getBrandsRouter);
 app.use(insertBrandstoSubCategoryRouter);
+app.use(getAllcategoriesRouter);
 
 app.all('*', async (req, res) => {
 	throw new NotFoundError();

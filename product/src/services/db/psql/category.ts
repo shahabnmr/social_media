@@ -52,6 +52,12 @@ export class CategoryService {
 		return category.rows[0];
 	}
 
+	async findAll(): Promise<Category[]> {
+		const category = await this.client.query('SELECT * FROM findCategories()', []);
+
+		return category.rows;
+	}
+
 	async end() {
 		await this.client.end();
 	}
