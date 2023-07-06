@@ -42,6 +42,16 @@ AS
 $$
     SELECT *
     FROM product.color 
-    WHERE id=id_ OR name=name_ OR code_color=code_color LIMIT 1;
+    WHERE id=id_ OR name=name_ OR code_color=code_color_
+     LIMIT 1;
+$$
+language sql;
+
+CREATE OR REPLACE FUNCTION findColors()
+  RETURNS SETOF product.color
+AS
+$$
+    SELECT *
+    FROM product.color;
 $$
 language sql;

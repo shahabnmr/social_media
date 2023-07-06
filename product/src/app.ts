@@ -10,23 +10,19 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 
 import Dbservice from './services/db/common/postgres/db.service';
-import { insertCategoryRouter } from './routes/insert/insert_category';
-import { insertColorRouter } from './routes/insert/insert_color';
-import { insertProductRouter } from './routes/insert/insert_product';
-import { colorOfProductRouter } from './routes/insert/insert_product_color';
-import { getProductRouter } from './routes/get/get_product';
-import { insertSubCategoryRouter } from './routes/insert/insert_sub_category';
-import { getSubCategoriesOfCategory } from './routes/get/get_sub_category_of_categories';
-import { insertFieldRouter } from './routes/insert/insert_field';
-import { getFieldsRouter } from './routes/get/get_fields';
-import { insertFieldsForSubCategory } from './routes/insert/insert_fieldsForSub_category';
-import { getFieldsOfSubCategoryRouter } from './routes/get/get_field_Of_subCategory';
-import { insertBrandRouter } from './routes/insert/insert_brand';
-import { getBrandsRouter } from './routes/get/get_brands';
-import { insertBrandstoSubCategoryRouter } from './routes/insert/insert_brand_to_subCategory';
+
+import { getBrandRouter } from './routes/v1/brand/brand_get';
+import { postBrandRouter } from './routes/v1/brand/brand_post';
+import { getCategoryRouter } from './routes/v1/category/category_get';
+import { postCategoryRouter } from './routes/v1/category/category_post';
+import { getColorRouter } from './routes/v1/color/color_get';
+import { postColorRouter } from './routes/v1/color/color_post';
+import { getProductRouter } from './routes/v1/product/product_get';
+import { postProductRouter } from './routes/v1/product/product_post';
+import { getSubCategoryRouter } from './routes/v1/subCategory/subCategory_get';
+import { postSubCategoryRouter } from './routes/v1/subCategory/subCategory_post';
+
 import { checkFileType } from './services/multer/checkFileType';
-import { getAllcategoriesRouter } from './routes/get/get_categories';
-import { getBrandsOfSubCategoryRouter } from './routes/get/get_brands_of_subCategory';
 
 const app = express();
 
@@ -71,22 +67,16 @@ const connections = async () => {
 };
 connections();
 
-app.use(insertCategoryRouter);
-app.use(insertColorRouter);
-app.use(upload.array('images', 5), insertProductRouter);
-app.use(colorOfProductRouter);
+app.use(postBrandRouter);
+app.use(getBrandRouter);
+app.use(postCategoryRouter);
+app.use(getCategoryRouter);
+app.use(upload.array('images', 5), postProductRouter);
 app.use(getProductRouter);
-app.use(insertSubCategoryRouter);
-app.use(getSubCategoriesOfCategory);
-app.use(insertFieldRouter);
-app.use(getFieldsRouter);
-app.use(insertFieldsForSubCategory);
-app.use(getFieldsOfSubCategoryRouter);
-app.use(insertBrandRouter);
-app.use(getBrandsRouter);
-app.use(insertBrandstoSubCategoryRouter);
-app.use(getAllcategoriesRouter);
-app.use(getBrandsOfSubCategoryRouter);
+app.use(getColorRouter);
+app.use(postColorRouter);
+app.use(postSubCategoryRouter);
+app.use(getSubCategoryRouter);
 
 app.all('*', async (req, res) => {
 	throw new NotFoundError();
