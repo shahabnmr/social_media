@@ -14,4 +14,10 @@ router.get('/api/v1/product/product/:productId', async (req: Request, res: Respo
 	res.status(200).send({ result });
 });
 
+router.get('/api/v1/product/products/', async (req: Request, res: Response) => {
+	const productService = await ProductService.getInstance();
+	const result = await productService.findAllProducts();
+	res.status(200).send({ result });
+});
+
 export { router as getProductRouter };

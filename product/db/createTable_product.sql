@@ -35,11 +35,21 @@ AS $$
 $$;
 
 CREATE OR REPLACE FUNCTION findOneProduct(id_ text, name_ text)
-  RETURNS SETOF product.color
+  RETURNS SETOF product.product
 AS
 $$
     SELECT *
-    FROM product.color 
+    FROM product.product 
     WHERE id=id_ OR name=name_ LIMIT 1;
+$$
+language sql;
+
+CREATE OR REPLACE FUNCTION findProducts()
+  RETURNS TABLE(id text, name text, price text, images text[],brand text)
+AS
+$$
+    SELECT p.id, p.name, p.price, p.images, b.name as brand
+    FROM product.product p
+    JOIN product.brand b ON b.id=p.brand;
 $$
 language sql;
