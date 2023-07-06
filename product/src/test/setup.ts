@@ -86,12 +86,12 @@ export const insertField = async (nameField: string) => {
 		.expect(201);
 };
 
-export const insertColor = async (nameColor: string) => {
+export const insertColor = async (nameColor: string, codeColor: string) => {
 	return await request(app)
 		.post('/api/v1/product/color')
 		.send({
 			name: nameColor,
-			code_color: '#123456',
+			code_color: codeColor,
 		})
 		.expect(201);
 };
