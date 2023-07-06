@@ -18,6 +18,14 @@ export interface Product {
 	fields: { fieldId: string; value: string }[] | string;
 }
 
+interface Products {
+	id: string;
+	name: string;
+	images: string[];
+	brand: string;
+	price: string;
+}
+
 export class ProductService {
 	static instance: ProductService | null;
 	db: any;
@@ -97,6 +105,11 @@ export class ProductService {
 
 	async deleteAllContent() {
 		await this.client.query('CALL deleteAllContent()');
+	}
+
+	async findAllProducts(): Promise<Products[]> {
+		const result = await this.client.query('SELECT * FROM findproducts()');
+		return result.rows;
 	}
 	async end() {
 		await this.client.end();

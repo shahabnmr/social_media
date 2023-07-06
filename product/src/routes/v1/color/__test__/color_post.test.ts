@@ -37,7 +37,7 @@ describe('insert color', () => {
 
 describe('insert_product_color', () => {
 	it('get 201 status code for insert color of product', async () => {
-		const product = await insertProduct();
+		const product = await insertProduct('name 1', '', '', '');
 		const color = await insertColor('blue', '#123456');
 
 		const result = await request(app).post('/api/v1/product/color_of_product/').send({
@@ -64,7 +64,7 @@ describe('insert_product_color', () => {
 	});
 
 	it('get 400 status code for colorId not exist', async () => {
-		const product = await insertProduct();
+		const product = await insertProduct('name 1', '', '', '');
 
 		const result = await request(app).post('/api/v1/product/color_of_product/').send({
 			product_id: product.body.product.id,
