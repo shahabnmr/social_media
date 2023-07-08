@@ -27,4 +27,12 @@ router.get('/api/v1/product/products/sub_category/', async (req: Request, res: R
 	res.status(200).send({ result });
 });
 
+router.get('/api/v1/product/products/category/', async (req: Request, res: Response) => {
+	const categoryId = req.query.categoryId as string;
+	const productService = await ProductService.getInstance();
+	const result = await productService.findProductsOfCategory(categoryId);
+
+	res.status(200).send({ result });
+});
+
 export { router as getProductRouter };
