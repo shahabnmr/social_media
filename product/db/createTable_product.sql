@@ -53,3 +53,14 @@ $$
     JOIN product.brand b ON b.id=p.brand;
 $$
 language sql;
+
+CREATE OR REPLACE FUNCTION findProductsOfSubCategory(subCategoryId_ text)
+  RETURNS TABLE(id text, name text, price text, images text[],brand text)
+AS
+$$
+    SELECT p.id, p.name, p.price, p.images, b.name as brand
+    FROM product.product p
+    JOIN product.brand b ON b.id=p.brand
+	WHERE p.sub_category_id=subCategoryId_;
+$$
+language sql;

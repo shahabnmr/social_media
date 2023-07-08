@@ -44,7 +44,7 @@ router.post(
 
 		const result = await brandService.insert(brand);
 
-		res.status(201).send({ result });
+		res.status(201).send({ brandId: result });
 	},
 );
 

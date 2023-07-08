@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { app } from '../../../../app';
-import { insertField, insertSubCategory } from '../../../../test/setup';
+import { insertCategory, insertField, insertSubCategory } from '../../../../test/setup';
 
 describe('insert field', () => {
 	it('get 201 status code for insert field', async () => {
@@ -31,12 +31,14 @@ describe('insert field', () => {
 describe('insert fields for subCategory', () => {
 	it('get 201 status code for insert fields for sub_category', async () => {
 		const field = await insertField('ram');
-		const subCategory = await insertSubCategory('laptop', 'electronics');
+		const field1 = await insertField('cpu');
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
 		const result = await request(app)
 			.post('/api/v1/product/sub_category/add-fields')
 			.send({
 				subCategory_id: subCategory.body.subCategoryId,
-				field_ids: [field.body.fieldId],
+				field_ids: [field.body.fieldId, field1.body.fieldId],
 			})
 			.expect(201);
 
@@ -57,12 +59,13 @@ describe('insert fields for subCategory', () => {
 	});
 
 	it('get 400 status code for insert fields for sub_category with incorrect field_ids', async () => {
-		const subCategory = await insertSubCategory('laptop', 'electronics');
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
 		const result = await request(app)
 			.post('/api/v1/product/sub_category/add-fields')
 			.send({
 				subCategory_id: subCategory.body.subCategoryId,
-				field_ids: ['incorerct'],
+				field_ids: ['incorrect'],
 			})
 			.expect(400);
 
@@ -72,18 +75,13 @@ describe('insert fields for subCategory', () => {
 
 describe('insert subCategory', () => {
 	it('got 201 statusCode for insert sub_category', async () => {
-		const category = await request(app)
-			.post('/api/v1/product/category/')
-			.send({
-				name: 'electronics',
-			})
-			.expect(201);
+		const category = await insertCategory('electronic');
 
 		return await request(app)
 			.post('/api/v1/product/sub_category')
 			.send({
 				name: 'laptop',
-				category_id: category.body.category,
+				category_id: category.body.categoryId,
 			})
 			.expect(201);
 	});
@@ -93,31 +91,30 @@ describe('insert subCategory', () => {
 			.post('/api/v1/product/sub_category')
 			.send({
 				name: 'laptop',
-				category_id: 'incorerct category_id',
+				category_id: 'incorrect category_id',
 			})
 			.expect(400);
 	});
 
 	it('got 400 statusCode for insert sub_category without name', async () => {
-		const category = await request(app)
-			.post('/api/v1/product/category/')
-			.send({
-				name: 'electronics',
-			})
-			.expect(201);
+		const category = await insertCategory('electronic');
+
 		return await request(app)
 			.post('/api/v1/product/sub_category')
 			.send({
-				category_id: category.body.category,
+				category_id: category.body.categoryId,
 			})
 			.expect(400);
 	});
 
 	it('got 400 statusCode for insert sub_category duplicate name', async () => {
-		const category = await request(app)
-			.post('/api/v1/product/category/')
+		const category = await insertCategory('electronic');
+
+		await request(app)
+			.post('/api/v1/product/sub_category')
 			.send({
-				name: 'electronics',
+				name: 'laptop',
+				category_id: category.body.categoryId,
 			})
 			.expect(201);
 
@@ -125,15 +122,7 @@ describe('insert subCategory', () => {
 			.post('/api/v1/product/sub_category')
 			.send({
 				name: 'laptop',
-				category_id: category.body.category,
-			})
-			.expect(201);
-
-		await request(app)
-			.post('/api/v1/product/sub_category')
-			.send({
-				name: 'laptop',
-				category_id: category.body.category,
+				category_id: category.body.categoryId,
 			})
 			.expect(400);
 	});

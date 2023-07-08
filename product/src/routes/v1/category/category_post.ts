@@ -18,7 +18,7 @@ router.post(
 		if (category) throw new BadRequestError(`this category name already exist: ${name}`);
 
 		const result = await categoryService.insert(name);
-		res.status(201).send({ category: result });
+		res.status(201).send({ categoryId: result });
 	},
 );
 

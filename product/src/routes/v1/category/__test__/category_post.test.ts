@@ -39,6 +39,6 @@ describe('insert category', () => {
 			})
 			.expect(201);
 
-		expect(category.body.category).toHaveLength(36);
+		expect(category.body.categoryId).toHaveLength(36);
 	});
 });

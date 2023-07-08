@@ -53,14 +53,12 @@ export const insertCategory = async (name: string) => {
 		.expect(201);
 };
 
-export const insertSubCategory = async (nameSubCategory: string, nameCategory: string) => {
-	const category = await insertCategory(nameCategory);
-
+export const insertSubCategory = async (nameSubCategory: string, categoryId: string) => {
 	return await request(app)
 		.post('/api/v1/product/sub_category')
 		.send({
 			name: nameSubCategory,
-			category_id: category.body.category,
+			category_id: categoryId,
 		})
 		.expect(201);
 };
@@ -96,44 +94,24 @@ export const insertColor = async (nameColor: string, codeColor: string) => {
 		.expect(201);
 };
 
-export const insertFieldsSubCategory = async () => {
-	const field = await insertField('ram');
-	const subCategory = await insertSubCategory('laptop', 'electronics');
-	await request(app)
+export const insertFieldsSubCategory = async (subCategoryId: string, fieldId: string) => {
+	return await request(app)
 		.post('/api/v1/product/sub_category/add-fields')
 		.send({
-			subCategory_id: subCategory.body.subCategoryId,
-			field_ids: [field.body.fieldId],
+			subCategory_id: subCategoryId,
+			field_ids: [fieldId],
 		})
 		.expect(201);
-	return { subCategory, field };
 };
 
 export const insertProduct = async (
 	name: string,
+	description: string,
+	price: string,
+	subCategoryId: string,
 	fieldId: string,
 	brandId: string,
-	subCategoryId: string,
 ) => {
-	let field: any;
-	if (!fieldId) {
-		field = await insertFieldsSubCategory();
-		fieldId = field.field.body.fieldId;
-		subCategoryId = field.subCategory.body.subCategoryId;
-	}
-	if (!brandId) {
-		const brand = await insertBrand('sony');
-		await request(app)
-			.post('/api/v1/product/brand/insert/to_sub_category/')
-			.send({
-				sub_category_id: field!.subCategory.body.subCategoryId,
-				brands: [brand.body.result],
-			})
-			.expect(201);
-
-		brandId = brand.body.result;
-	}
-
 	return await request(app)
 		.post('/api/v1/product/')
 		.send({
@@ -146,20 +124,14 @@ export const insertProduct = async (
 		});
 };
 
-export const insertBrandToSubCategory = async () => {
-	const subCategory = await insertSubCategory('laptop', 'electronics');
-
-	const brand = await insertBrand('sony');
-
-	await request(app)
+export const insertBrandToSubCategory = async (subCategoryId: string, brandId: string) => {
+	return await request(app)
 		.post('/api/v1/product/brand/insert/to_sub_category/')
 		.send({
-			sub_category_id: subCategory.body.subCategoryId,
-			brands: [brand.body.result],
+			sub_category_id: subCategoryId,
+			brands: [brandId],
 		})
 		.expect(201);
-
-	return subCategory.body.subCategoryId;
 };
 
 // export const signin = async () => {
