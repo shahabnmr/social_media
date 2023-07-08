@@ -1,24 +1,25 @@
 import request from 'supertest';
 import { app } from '../../../../app';
-import { insertBrand, insertSubCategory } from '../../../../test/setup';
+import { insertBrand, insertCategory, insertSubCategory } from '../../../../test/setup';
 
 describe('insert brand to sub_category', () => {
 	it('get 201 statusCode for insert brand to sub_category', async () => {
-		const subCategory = await insertSubCategory('laptop', 'electronics');
-
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
 		const brand = await insertBrand('sony');
 
 		return request(app)
 			.post('/api/v1/product/brand/insert/to_sub_category/')
 			.send({
 				sub_category_id: subCategory.body.subCategoryId,
-				brands: [brand.body.result],
+				brands: [brand.body.brandId],
 			})
 			.expect(201);
 	});
 
 	it('get 400 statusCode for insert brand with brandId incorrect', async () => {
-		const subCategory = await insertSubCategory('laptop', 'electrincs');
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
 
 		const result = await request(app)
 			.post('/api/v1/product/brand/insert/to_sub_category/')

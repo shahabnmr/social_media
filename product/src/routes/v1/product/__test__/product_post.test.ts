@@ -1,19 +1,22 @@
 import request from 'supertest';
 import { app } from '../../../../app';
-import { insertBrand, insertFieldsSubCategory, insertSubCategory } from '../../../../test/setup';
+import {
+	insertBrand,
+	insertBrandToSubCategory,
+	insertCategory,
+	insertField,
+	insertFieldsSubCategory,
+	insertSubCategory,
+} from '../../../../test/setup';
 
 describe('insert product', () => {
 	it('get 201 status code for insert product', async () => {
-		const { subCategory, field } = await insertFieldsSubCategory();
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const field = await insertField('ram');
 		const brand = await insertBrand('sony');
-
-		await request(app)
-			.post('/api/v1/product/brand/insert/to_sub_category/')
-			.send({
-				sub_category_id: subCategory.body.subCategoryId,
-				brands: [brand.body.result],
-			})
-			.expect(201);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
 
 		const result = await request(app)
 			.post('/api/v1/product/')
@@ -23,7 +26,7 @@ describe('insert product', () => {
 				price: '155',
 				sub_category_id: subCategory.body.subCategoryId,
 				fields: [{ fieldId: field.body.fieldId, value: '256' }],
-				brandId: brand.body.result,
+				brandId: brand.body.brandId,
 			});
 
 		expect(result.body.product.name).toEqual('z5 laptop');
@@ -48,17 +51,13 @@ describe('insert product', () => {
 	});
 
 	it('get 400 status code for insert product with this subCategory not have this brand', async () => {
-		const anotherSubCategory = await insertSubCategory('T-shirt', 'clothes');
-		const { subCategory, field } = await insertFieldsSubCategory();
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const anotherSubCategory = await insertSubCategory('mobile', category.body.categoryId);
+		const field = await insertField('ram');
 		const brand = await insertBrand('sony');
-
-		await request(app)
-			.post('/api/v1/product/brand/insert/to_sub_category/')
-			.send({
-				sub_category_id: subCategory.body.subCategoryId,
-				brands: [brand.body.result],
-			})
-			.expect(201);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
 
 		const result = await request(app)
 			.post('/api/v1/product/')
@@ -68,23 +67,19 @@ describe('insert product', () => {
 				price: '155',
 				sub_category_id: anotherSubCategory.body.subCategoryId,
 				fields: [{ fieldId: field.body.fieldId, value: '256' }],
-				brandId: brand.body.result,
+				brandId: brand.body.brandId,
 			});
 
 		expect(result.body.errors[0].message).toEqual('this subCategory not have this brand');
 	});
 
 	it('get 400 status code for insert product with incorrect fieldId', async () => {
-		const { subCategory, field } = await insertFieldsSubCategory();
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const field = await insertField('ram');
 		const brand = await insertBrand('sony');
-
-		await request(app)
-			.post('/api/v1/product/brand/insert/to_sub_category/')
-			.send({
-				sub_category_id: subCategory.body.subCategoryId,
-				brands: [brand.body.result],
-			})
-			.expect(201);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
 
 		const result = await request(app)
 			.post('/api/v1/product/')
@@ -94,7 +89,7 @@ describe('insert product', () => {
 				price: '155',
 				sub_category_id: subCategory.body.subCategoryId,
 				fields: [{ fieldId: 'c12f5b08-23cd-401d-8ead-d900d23c83cb', value: '256' }],
-				brandId: brand.body.result,
+				brandId: brand.body.brandId,
 			});
 
 		expect(result.body.errors[0].message).toEqual(
@@ -103,38 +98,30 @@ describe('insert product', () => {
 	});
 
 	it('get 400 status code for insert product if name be duplicated', async () => {
-		const { subCategory, field } = await insertFieldsSubCategory();
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const field = await insertField('ram');
 		const brand = await insertBrand('sony');
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
 
-		await request(app)
-			.post('/api/v1/product/brand/insert/to_sub_category/')
-			.send({
-				sub_category_id: subCategory.body.subCategoryId,
-				brands: [brand.body.result],
-			})
-			.expect(201);
+		await request(app).post('/api/v1/product/').send({
+			name: 'z5 laptop',
+			description: 'this is a good laptop',
+			price: '155',
+			sub_category_id: subCategory.body.subCategoryId,
+			fields: [{ fieldId: field.body.fieldId, value: '256' }],
+			brandId: brand.body.brandId,
+		});
 
-		await request(app)
-			.post('/api/v1/product/')
-			.send({
-				name: 'z5 laptop',
-				description: 'this is a good laptop',
-				price: '155',
-				sub_category_id: subCategory.body.subCategoryId,
-				fields: [{ fieldId: field.body.fieldId, value: '256' }],
-				brandId: brand.body.result,
-			});
-
-		const result = await request(app)
-			.post('/api/v1/product/')
-			.send({
-				name: 'z5 laptop',
-				description: 'this is a good laptop',
-				price: '155',
-				sub_category_id: subCategory.body.subCategoryId,
-				fields: [{ fieldId: field.body.fieldId, value: '256' }],
-				brandId: brand.body.result,
-			});
+		const result = await request(app).post('/api/v1/product/').send({
+			name: 'z5 laptop',
+			description: 'this is a good laptop',
+			price: '155',
+			sub_category_id: subCategory.body.subCategoryId,
+			fields: [{ fieldId: field.body.fieldId, value: '256' }],
+			brandId: brand.body.brandId,
+		});
 
 		expect(result.body.errors[0].message).toEqual('this product name already exist: z5 laptop');
 	});

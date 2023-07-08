@@ -1,6 +1,15 @@
 import request from 'supertest';
 import { app } from '../../../../app';
-import { insertColor, insertProduct } from '../../../../test/setup';
+import {
+	insertBrand,
+	insertBrandToSubCategory,
+	insertCategory,
+	insertColor,
+	insertField,
+	insertFieldsSubCategory,
+	insertProduct,
+	insertSubCategory,
+} from '../../../../test/setup';
 
 describe('insert color', () => {
 	it('get 201 status code for insert color', async () => {
@@ -37,7 +46,20 @@ describe('insert color', () => {
 
 describe('insert_product_color', () => {
 	it('get 201 status code for insert color of product', async () => {
-		const product = await insertProduct('name 1', '', '', '');
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const field = await insertField('ram');
+		const brand = await insertBrand('sony');
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const product = await insertProduct(
+			'name 1',
+			'abcd',
+			'150',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
 		const color = await insertColor('blue', '#123456');
 
 		const result = await request(app).post('/api/v1/product/color_of_product/').send({
@@ -46,7 +68,7 @@ describe('insert_product_color', () => {
 			amount: '10',
 		});
 
-		expect(result.body.colorOfProductId).toHaveLength(36);
+		expect(result.body.message).toEqual('insert successful');
 	});
 
 	it('get 400 status code for product not exist', async () => {
@@ -64,7 +86,20 @@ describe('insert_product_color', () => {
 	});
 
 	it('get 400 status code for colorId not exist', async () => {
-		const product = await insertProduct('name 1', '', '', '');
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const field = await insertField('ram');
+		const brand = await insertBrand('sony');
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const product = await insertProduct(
+			'name 1',
+			'abcd',
+			'150',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
 
 		const result = await request(app).post('/api/v1/product/color_of_product/').send({
 			product_id: product.body.product.id,

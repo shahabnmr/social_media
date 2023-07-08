@@ -20,4 +20,11 @@ router.get('/api/v1/product/products/', async (req: Request, res: Response) => {
 	res.status(200).send({ result });
 });
 
+router.get('/api/v1/product/products/sub_category/', async (req: Request, res: Response) => {
+	const subCategoryId = req.query.subCategoryId as string;
+	const productService = await ProductService.getInstance();
+	const result = await productService.findProductsOfSubCategory(subCategoryId);
+	res.status(200).send({ result });
+});
+
 export { router as getProductRouter };

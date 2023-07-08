@@ -111,6 +111,14 @@ export class ProductService {
 		const result = await this.client.query('SELECT * FROM findproducts()');
 		return result.rows;
 	}
+
+	async findProductsOfSubCategory(subCategoryId: string): Promise<Products[]> {
+		const result = await this.client.query('SELECT * FROM findProductsOfSubCategory($1)', [
+			subCategoryId,
+		]);
+		return result.rows;
+	}
+
 	async end() {
 		await this.client.end();
 	}
