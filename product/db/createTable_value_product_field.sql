@@ -76,11 +76,11 @@ FROM product.product p,
 	LATERAL(
 		SELECT b.name AS brand 
 		FROM product.brand b 
-		JOIN product.product p ON p.brand=b.id)b,
+		WHERE p.brand=b.id)b,
 	LATERAL(
 		SELECT sc.name AS sub_category
 		FROM product.sub_category sc
-		JOIN product.product p ON p.sub_category_id=sc.id)sc
+		WHERE p.sub_category_id=sc.id)sc
 WHERE p.id=product_id_ OR p.name=name_;
 $$
 language sql;
@@ -99,5 +99,32 @@ $$
 				product.color,
 				product.sub_category_field
 		CASCADE;
+$$
+language sql;
+
+CREATE OR REPLACE FUNCTION searchAllProducts(text_ text)
+  RETURNS TABLE(id text, name text, price text, images text[],brand text, rank real)
+AS
+$$
+    select t.id,t.name,t.price,t.images,t.brand,t.rank
+from 
+(SELECT p.id, p.name, p.price, p.images, b.brand,ts_rank_cd(
+		array[0.1,0.3,0.5,1.0],
+		setweight(to_tsvector(p.name), 'A') || 
+		setweight(to_tsvector(p.description), 'C') ||
+		setweight(to_tsvector(f.fields), 'B'),
+		websearch_to_tsquery(text_),4) as rank
+FROM product.product p,
+  LATERAL (
+		SELECT json_agg(json_build_object('id',f.id,f.name,vpf.value)) AS fields
+		FROM product.field f
+		JOIN product.value_product_field vpf ON f.id=vpf.field_id
+		WHERE vpf.product_id=p.id)f,
+  LATERAL(
+		SELECT b.name AS brand 
+		FROM product.brand b 
+		where p.brand=b.id)b
+order by rank desc) as t
+where t.rank > 0.001;
 $$
 language sql;
