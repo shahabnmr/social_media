@@ -72,7 +72,7 @@ $$
     SELECT p.id, p.name, p.price, p.images, b.name as brand
     FROM product.product p
     JOIN product.brand b ON b.id=p.brand
-	JOIN product.sub_category sb ON sb.id=p.sub_category_id
-	WHERE category_id=categoryId_;
+	  JOIN product.sub_category sb ON sb.id=p.sub_category_id
+	  WHERE category_id=categoryId_;
 $$
 language sql;

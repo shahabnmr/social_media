@@ -116,8 +116,8 @@ export const insertProduct = async (
 		.post('/api/v1/product/')
 		.send({
 			name,
-			description: 'this is a good laptop',
-			price: '155',
+			description: description,
+			price: price,
 			sub_category_id: subCategoryId,
 			fields: [{ fieldId: fieldId, value: '256' }],
 			brandId: brandId,

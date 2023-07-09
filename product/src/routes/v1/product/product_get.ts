@@ -35,4 +35,11 @@ router.get('/api/v1/product/products/category/', async (req: Request, res: Respo
 	res.status(200).send({ result });
 });
 
+router.get('/api/v1/product/products/search/all', async (req: Request, res: Response) => {
+	const { text } = req.body;
+	const productService = await ProductService.getInstance();
+	const result = await productService.searchAllProducts(text);
+
+	res.status(200).send({ result });
+});
 export { router as getProductRouter };
