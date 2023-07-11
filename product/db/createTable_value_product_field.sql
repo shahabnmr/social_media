@@ -106,8 +106,8 @@ CREATE OR REPLACE FUNCTION searchAllProducts(text_ text)
   RETURNS TABLE(id text, name text, price text, images text[],brand text, rank real)
 AS
 $$
-    select t.id,t.name,t.price,t.images,t.brand,t.rank
-from 
+    SELECT t.id,t.name,t.price,t.images,t.brand,t.rank
+FROM 
 (SELECT p.id, p.name, p.price, p.images, b.brand,ts_rank_cd(
 		array[0.1,0.3,0.5,1.0],
 		setweight(to_tsvector(p.name), 'A') || 
@@ -123,8 +123,8 @@ FROM product.product p,
   LATERAL(
 		SELECT b.name AS brand 
 		FROM product.brand b 
-		where p.brand=b.id)b
-order by rank desc) as t
-where t.rank > 0.001;
+		WHERE p.brand=b.id)b
+ORDER BY rank desc) AS t
+WHERE t.rank > 0.001;
 $$
 language sql;

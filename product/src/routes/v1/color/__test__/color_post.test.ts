@@ -60,15 +60,53 @@ describe('insert_product_color', () => {
 			field.body.fieldId,
 			brand.body.brandId,
 		);
+		const product1 = await insertProduct(
+			'name 2',
+			'abcd',
+			'150',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
+		const product3 = await insertProduct(
+			'name 3',
+			'abcd',
+			'150',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
 		const color = await insertColor('blue', '#123456');
+		const color1 = await insertColor('red', '#123486');
+		const color2 = await insertColor('orange', '#103486');
 
 		const result = await request(app).post('/api/v1/product/color_of_product/').send({
 			product_id: product.body.product.id,
 			color_id: color.body.colorId,
 			amount: '10',
 		});
+		const result1 = await request(app).post('/api/v1/product/color_of_product/').send({
+			product_id: product1.body.product.id,
+			color_id: color.body.colorId,
+			amount: '10',
+		});
+		await request(app).post('/api/v1/product/color_of_product/').send({
+			product_id: product1.body.product.id,
+			color_id: color1.body.colorId,
+			amount: '2',
+		});
+		await request(app).post('/api/v1/product/color_of_product/').send({
+			product_id: product1.body.product.id,
+			color_id: color2.body.colorId,
+			amount: '4',
+		});
+		await request(app).post('/api/v1/product/color_of_product/').send({
+			product_id: product3.body.product.id,
+			color_id: color2.body.colorId,
+			amount: '0',
+		});
 
-		expect(result.body.message).toEqual('insert successful');
+		expect(result.body.message).toEqual('insert successfl');
 	});
 
 	it('get 400 status code for product not exist', async () => {

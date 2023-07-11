@@ -38,7 +38,7 @@ describe('get product', () => {
 		expect(result.body.errors[0].message).toEqual('productId is invalid');
 	});
 
-	it('get all product', async () => {
+	it('get all products', async () => {
 		const category = await insertCategory('electronic');
 		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
 		const field = await insertField('ram');
@@ -56,16 +56,18 @@ describe('get product', () => {
 		const product2 = await insertProduct(
 			'name 2',
 			'abcd',
-			'150',
+			'151',
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
 		);
 
-		const result = await request(app).get('/api/v1/product/products');
+		const result = await request(app)
+			.get('/api/v1/product/products')
+			.send({ filterName: 'price', sorting: 'desc' });
 
-		expect(result.body.result[0].id).toEqual(product1.body.product.id);
-		expect(result.body.result[1].id).toEqual(product2.body.product.id);
+		expect(result.body.result[1].id).toEqual(product1.body.product.id);
+		expect(result.body.result[0].id).toEqual(product2.body.product.id);
 	});
 
 	it('get all product of subCategory', async () => {
@@ -87,7 +89,7 @@ describe('get product', () => {
 		const product2 = await insertProduct(
 			'name 2',
 			'abcd',
-			'150',
+			'151',
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
@@ -110,10 +112,11 @@ describe('get product', () => {
 
 		const result = await request(app)
 			.get('/api/v1/product/products/sub_category/')
+			.send({ filterName: 'price', sorting: 'desc' })
 			.query({ subCategoryId: subCategory.body.subCategoryId });
 
-		expect(result.body.result[0].id).toEqual(product1.body.product.id);
-		expect(result.body.result[1].id).toEqual(product2.body.product.id);
+		expect(result.body.result[1].id).toEqual(product1.body.product.id);
+		expect(result.body.result[0].id).toEqual(product2.body.product.id);
 		expect(result.body.result).toHaveLength(2);
 	});
 
@@ -136,7 +139,7 @@ describe('get product', () => {
 		const product2 = await insertProduct(
 			'name 2',
 			'abcd',
-			'150',
+			'151',
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
@@ -159,10 +162,11 @@ describe('get product', () => {
 
 		const result = await request(app)
 			.get('/api/v1/product/products/category/')
+			.send({ filterName: 'price', sorting: 'desc' })
 			.query({ categoryId: category.body.categoryId });
 
-		expect(result.body.result[0].id).toEqual(product1.body.product.id);
-		expect(result.body.result[1].id).toEqual(product2.body.product.id);
+		expect(result.body.result[1].id).toEqual(product1.body.product.id);
+		expect(result.body.result[0].id).toEqual(product2.body.product.id);
 		expect(result.body.result).toHaveLength(2);
 	});
 

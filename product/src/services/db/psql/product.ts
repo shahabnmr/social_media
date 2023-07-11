@@ -107,21 +107,36 @@ export class ProductService {
 		await this.client.query('CALL deleteAllContent()');
 	}
 
-	async findAllProducts(): Promise<Products[]> {
-		const result = await this.client.query('SELECT * FROM findproducts()');
-		return result.rows;
-	}
-
-	async findProductsOfSubCategory(subCategoryId: string): Promise<Products[]> {
-		const result = await this.client.query('SELECT * FROM findProductsOfSubCategory($1)', [
-			subCategoryId,
+	async findAllProducts(filerName: string, sorting: string): Promise<Products[]> {
+		const result = await this.client.query('SELECT * FROM findproducts($1,$2)', [
+			filerName,
+			sorting,
 		]);
 		return result.rows;
 	}
 
-	async findProductsOfCategory(categoryId: string): Promise<Products[]> {
-		const result = await this.client.query('SELECT * FROM findProductsOfCategory($1)', [
+	async findProductsOfSubCategory(
+		subCategoryId: string,
+		filterName: string,
+		sorting: string,
+	): Promise<Products[]> {
+		const result = await this.client.query('SELECT * FROM findProductsOfSubCategory($1,$2,$3)', [
+			subCategoryId,
+			filterName,
+			sorting,
+		]);
+		return result.rows;
+	}
+
+	async findProductsOfCategory(
+		categoryId: string,
+		filterName: string,
+		sorting: string,
+	): Promise<Products[]> {
+		const result = await this.client.query('SELECT * FROM findProductsOfCategory($1,$2,$3)', [
 			categoryId,
+			filterName,
+			sorting,
 		]);
 
 		return result.rows;

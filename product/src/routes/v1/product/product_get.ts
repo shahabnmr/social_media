@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express';
+import { body } from 'express-validator';
+import { BadRequestError, validateRequest } from '@sn_common/common';
 
 import { ProductService } from '../../../services/db/psql/product';
-import { BadRequestError } from '@sn_common/common';
 
 const router = express.Router();
 
@@ -14,26 +15,66 @@ router.get('/api/v1/product/product/:productId', async (req: Request, res: Respo
 	res.status(200).send({ result });
 });
 
-router.get('/api/v1/product/products/', async (req: Request, res: Response) => {
-	const productService = await ProductService.getInstance();
-	const result = await productService.findAllProducts();
-	res.status(200).send({ result });
-});
+router.get(
+	'/api/v1/product/products/',
+	[
+		body('filterName')
+			.isIn(['price', 'createddate'])
+			.withMessage('filtername must be price or createddate'),
+		body('sorting').isIn(['desc', 'asc']).withMessage('sorting must be desc or asc'),
+	],
+	validateRequest,
+	async (req: Request, res: Response) => {
+		const { filterName, sorting } = req.body;
 
-router.get('/api/v1/product/products/sub_category/', async (req: Request, res: Response) => {
-	const subCategoryId = req.query.subCategoryId as string;
-	const productService = await ProductService.getInstance();
-	const result = await productService.findProductsOfSubCategory(subCategoryId);
-	res.status(200).send({ result });
-});
+		const productService = await ProductService.getInstance();
+		const result = await productService.findAllProducts(filterName, sorting);
+		res.status(200).send({ result });
+	},
+);
 
-router.get('/api/v1/product/products/category/', async (req: Request, res: Response) => {
-	const categoryId = req.query.categoryId as string;
-	const productService = await ProductService.getInstance();
-	const result = await productService.findProductsOfCategory(categoryId);
+router.get(
+	'/api/v1/product/products/sub_category/',
+	[
+		body('filterName')
+			.isIn(['price', 'createddate'])
+			.withMessage('filtername must be price or createddate'),
+		body('sorting').isIn(['desc', 'asc']).withMessage('sorting must be desc or asc'),
+	],
+	validateRequest,
+	async (req: Request, res: Response) => {
+		const { filterName, sorting } = req.body;
+		const subCategoryId = req.query.subCategoryId as string;
 
-	res.status(200).send({ result });
-});
+		const productService = await ProductService.getInstance();
+		const result = await productService.findProductsOfSubCategory(
+			subCategoryId,
+			filterName,
+			sorting,
+		);
+		res.status(200).send({ result });
+	},
+);
+
+router.get(
+	'/api/v1/product/products/category/',
+	[
+		body('filterName')
+			.isIn(['price', 'createddate'])
+			.withMessage('filtername must be price or createddate'),
+		body('sorting').isIn(['desc', 'asc']).withMessage('sorting must be desc or asc'),
+	],
+	validateRequest,
+	async (req: Request, res: Response) => {
+		const { filterName, sorting } = req.body;
+		const categoryId = req.query.categoryId as string;
+
+		const productService = await ProductService.getInstance();
+		const result = await productService.findProductsOfCategory(categoryId, filterName, sorting);
+
+		res.status(200).send({ result });
+	},
+);
 
 router.get('/api/v1/product/products/search/all', async (req: Request, res: Response) => {
 	const { text } = req.body;
