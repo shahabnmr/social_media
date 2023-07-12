@@ -4,6 +4,8 @@ import {
 	insertBrand,
 	insertBrandToSubCategory,
 	insertCategory,
+	insertColor,
+	insertColorToProduct,
 	insertField,
 	insertFieldsSubCategory,
 	insertProduct,
@@ -38,7 +40,7 @@ describe('get product', () => {
 		expect(result.body.errors[0].message).toEqual('productId is invalid');
 	});
 
-	it('get all product', async () => {
+	it('get all products', async () => {
 		const category = await insertCategory('electronic');
 		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
 		const field = await insertField('ram');
@@ -56,16 +58,18 @@ describe('get product', () => {
 		const product2 = await insertProduct(
 			'name 2',
 			'abcd',
-			'150',
+			'151',
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
 		);
 
-		const result = await request(app).get('/api/v1/product/products');
+		const result = await request(app)
+			.get('/api/v1/product/products')
+			.send({ orderName: 'price', sorting: 'desc', exist: false });
 
-		expect(result.body.result[0].id).toEqual(product1.body.product.id);
-		expect(result.body.result[1].id).toEqual(product2.body.product.id);
+		expect(result.body.result[1].id).toEqual(product1.body.product.id);
+		expect(result.body.result[0].id).toEqual(product2.body.product.id);
 	});
 
 	it('get all product of subCategory', async () => {
@@ -87,7 +91,7 @@ describe('get product', () => {
 		const product2 = await insertProduct(
 			'name 2',
 			'abcd',
-			'150',
+			'151',
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
@@ -110,11 +114,64 @@ describe('get product', () => {
 
 		const result = await request(app)
 			.get('/api/v1/product/products/sub_category/')
+			.send({ orderName: 'price', sorting: 'desc', exist: false })
 			.query({ subCategoryId: subCategory.body.subCategoryId });
 
-		expect(result.body.result[0].id).toEqual(product1.body.product.id);
-		expect(result.body.result[1].id).toEqual(product2.body.product.id);
+		expect(result.body.result[1].id).toEqual(product1.body.product.id);
+		expect(result.body.result[0].id).toEqual(product2.body.product.id);
 		expect(result.body.result).toHaveLength(2);
+	});
+
+	it('get all product of subCategory Exist', async () => {
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const field = await insertField('ram');
+		const brand = await insertBrand('sony');
+		const color = await insertColor('blue', '#123456');
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const product1 = await insertProduct(
+			'name 1',
+			'abcd',
+			'150',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
+		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0');
+
+		const product2 = await insertProduct(
+			'name 2',
+			'abcd',
+			'151',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
+		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2');
+
+		const category1 = await insertCategory('clothes');
+		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId);
+		const field1 = await insertField('height');
+		const brand1 = await insertBrand('adidas');
+		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId);
+		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId);
+		const product3 = await insertProduct(
+			'clothes1',
+			'abcd',
+			'150',
+			subCategory1.body.subCategoryId,
+			field1.body.fieldId,
+			brand1.body.brandId,
+		);
+
+		const result = await request(app)
+			.get('/api/v1/product/products/sub_category/')
+			.send({ orderName: 'price', sorting: 'desc', exist: true })
+			.query({ subCategoryId: subCategory.body.subCategoryId });
+
+		expect(result.body.result[0].id).toEqual(product2.body.product.id);
+		expect(result.body.result).toHaveLength(1);
 	});
 
 	it('get all product of category', async () => {
@@ -136,7 +193,7 @@ describe('get product', () => {
 		const product2 = await insertProduct(
 			'name 2',
 			'abcd',
-			'150',
+			'151',
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
@@ -159,11 +216,64 @@ describe('get product', () => {
 
 		const result = await request(app)
 			.get('/api/v1/product/products/category/')
+			.send({ orderName: 'price', sorting: 'desc', exist: false })
 			.query({ categoryId: category.body.categoryId });
 
-		expect(result.body.result[0].id).toEqual(product1.body.product.id);
-		expect(result.body.result[1].id).toEqual(product2.body.product.id);
+		expect(result.body.result[1].id).toEqual(product1.body.product.id);
+		expect(result.body.result[0].id).toEqual(product2.body.product.id);
 		expect(result.body.result).toHaveLength(2);
+	});
+
+	it('get all product of category exist', async () => {
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const field = await insertField('ram');
+		const brand = await insertBrand('sony');
+		const color = await insertColor('blue', '#123456');
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const product1 = await insertProduct(
+			'name 1',
+			'abcd',
+			'150',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
+		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0');
+
+		const product2 = await insertProduct(
+			'name 2',
+			'abcd',
+			'151',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
+		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2');
+
+		const category1 = await insertCategory('clothes');
+		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId);
+		const field1 = await insertField('height');
+		const brand1 = await insertBrand('adidas');
+		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId);
+		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId);
+		const product3 = await insertProduct(
+			'clothes1',
+			'abcd',
+			'150',
+			subCategory1.body.subCategoryId,
+			field1.body.fieldId,
+			brand1.body.brandId,
+		);
+
+		const result = await request(app)
+			.get('/api/v1/product/products/category/')
+			.send({ orderName: 'price', sorting: 'desc', exist: true })
+			.query({ categoryId: category.body.categoryId });
+
+		expect(result.body.result[0].id).toEqual(product2.body.product.id);
+		expect(result.body.result).toHaveLength(1);
 	});
 
 	it('search all product', async () => {
@@ -185,7 +295,7 @@ describe('get product', () => {
 		const product2 = await insertProduct(
 			'my name is ali and jafar',
 			'my description is bad',
-			'150',
+			'151',
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
@@ -200,7 +310,7 @@ describe('get product', () => {
 		const product3 = await insertProduct(
 			'my name is good clothes',
 			'description is for test thats it',
-			'150',
+			'152',
 			subCategory1.body.subCategoryId,
 			field1.body.fieldId,
 			brand1.body.brandId,
@@ -208,10 +318,95 @@ describe('get product', () => {
 
 		const result = await request(app)
 			.get('/api/v1/product/products/search/all')
-			.send({ text: 'good' });
+			.send({ text: 'good', orderName: 'price', sorting: 'desc', exist: false });
 
 		expect(result.body.result[0].id).toEqual(product3.body.product.id);
 		expect(result.body.result[1].id).toEqual(product1.body.product.id);
 		expect(result.body.result).toHaveLength(2);
+	});
+
+	it('search all product exist', async () => {
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const field = await insertField('ram');
+		const brand = await insertBrand('sony');
+		const color = await insertColor('blue', '#123456');
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const product1 = await insertProduct(
+			'this is name one',
+			'this is description good',
+			'150',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
+		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0');
+
+		const product2 = await insertProduct(
+			'my name is ali and jafar',
+			'my description is bad',
+			'151',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
+		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2');
+
+		const category1 = await insertCategory('clothes');
+		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId);
+		const field1 = await insertField('height');
+		const brand1 = await insertBrand('adidas');
+		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId);
+		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId);
+		const product3 = await insertProduct(
+			'my name is good clothes',
+			'description is for test thats it',
+			'152',
+			subCategory1.body.subCategoryId,
+			field1.body.fieldId,
+			brand1.body.brandId,
+		);
+
+		const result = await request(app)
+			.get('/api/v1/product/products/search/all')
+			.send({ text: 'name', orderName: 'price', sorting: 'desc', exist: true });
+
+		expect(result.body.result[0].id).toEqual(product2.body.product.id);
+		expect(result.body.result).toHaveLength(1);
+	});
+
+	it('get all products Exist', async () => {
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const field = await insertField('ram');
+		const brand = await insertBrand('sony');
+		const color = await insertColor('blue', '#123456');
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const product1 = await insertProduct(
+			'name 1',
+			'abcd',
+			'150',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
+		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0');
+		const product2 = await insertProduct(
+			'name 2',
+			'abcd',
+			'151',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+		);
+		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2');
+
+		const result = await request(app)
+			.get('/api/v1/product/products')
+			.send({ orderName: 'price', sorting: 'desc', exist: true });
+
+		expect(result.body.result[0].id).toEqual(product2.body.product.id);
 	});
 });
