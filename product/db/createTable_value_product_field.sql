@@ -102,29 +102,75 @@ $$
 $$
 language sql;
 
-CREATE OR REPLACE FUNCTION searchAllProducts(text_ text)
-  RETURNS TABLE(id text, name text, price text, images text[],brand text, rank real)
+CREATE OR REPLACE FUNCTION searchAllProducts(text_ text,
+												columnname character varying, 
+												sorting character varying
+											)
+  RETURNS TABLE(id character varying, name text, price text, images text[],brand text, rank real)
 AS
 $$
-    SELECT t.id,t.name,t.price,t.images,t.brand,t.rank
-FROM 
-(SELECT p.id, p.name, p.price, p.images, b.brand,ts_rank_cd(
-		array[0.1,0.3,0.5,1.0],
-		setweight(to_tsvector(p.name), 'A') || 
-		setweight(to_tsvector(p.description), 'C') ||
-		setweight(to_tsvector(f.fields), 'B'),
-		websearch_to_tsquery(text_),4) as rank
-FROM product.product p,
-  LATERAL (
-		SELECT json_agg(json_build_object('id',f.id,f.name,vpf.value)) AS fields
-		FROM product.field f
-		JOIN product.value_product_field vpf ON f.id=vpf.field_id
-		WHERE vpf.product_id=p.id)f,
-  LATERAL(
-		SELECT b.name AS brand 
-		FROM product.brand b 
-		WHERE p.brand=b.id)b
-ORDER BY rank desc) AS t
-WHERE t.rank > 0.001;
+BEGIN
+	RETURN QUERY EXECUTE format('
+		SELECT t.id,t.name,t.price,t.images,t.brand,t.rank
+		FROM 
+			(SELECT p.id, p.name, p.price, p.images, b.brand,ts_rank_cd(
+				array[0.1,0.3,0.5,1.0],
+				setweight(to_tsvector(p.name), ''A'') || 
+				setweight(to_tsvector(p.description), ''C'') ||
+				setweight(to_tsvector(f.fields), ''B''),
+				websearch_to_tsquery(%L),16) as rank
+			FROM product.product p,
+			LATERAL (
+				SELECT json_agg(json_build_object(''id'',f.id,f.name,vpf.value)) AS fields
+				FROM product.field f
+				JOIN product.value_product_field vpf ON f.id=vpf.field_id
+				WHERE vpf.product_id=p.id)f,
+			LATERAL(
+				SELECT b.name AS brand 
+				FROM product.brand b 
+				WHERE p.brand=b.id)b
+			ORDER BY rank desc) AS t
+		WHERE t.rank > 0.001
+		ORDER BY t.%I %s;
+		',text_,columnname,sorting);
+END;
 $$
-language sql;
+language plpgsql;
+
+CREATE OR REPLACE FUNCTION searchAllProductsExist(text_ text,
+												columnname character varying, 
+												sorting character varying
+											)
+  RETURNS TABLE(id character varying, name text, price text, images text[],brand text, rank real,total bigint)
+AS
+$$
+BEGIN
+	RETURN QUERY EXECUTE format('
+		SELECT t.id,t.name,t.price,t.images,t.brand,t.rank,SUM(pc.amount) AS total
+		FROM 
+			(
+				SELECT p.id, p.name, p.price, p.images, b.brand,ts_rank_cd(
+					array[0.1,0.3,0.5,1.0],
+					setweight(to_tsvector(p.name), ''A'') || 
+					setweight(to_tsvector(p.description), ''C'') ||
+					setweight(to_tsvector(f.fields), ''B''),
+					websearch_to_tsquery(%L),16) as rank
+				FROM product.product p,
+				LATERAL (
+					SELECT json_agg(json_build_object(''id'',f.id,f.name,vpf.value)) AS fields
+					FROM product.field f
+					JOIN product.value_product_field vpf ON f.id=vpf.field_id
+					WHERE vpf.product_id=p.id)f,
+				LATERAL(
+					SELECT b.name AS brand 
+					FROM product.brand b 
+					WHERE p.brand=b.id)b
+			) AS t
+		JOIN product.product_color pc ON pc.product_id=t.id 
+		GROUP BY t.id,t.name,t.price,t.images,t.brand,t.rank
+		HAVING SUM(pc.amount) > 0 AND t.rank > 0.001
+		ORDER BY t.%I %s;
+		',text_,columnname,sorting);
+END;
+$$
+language plpgsql;

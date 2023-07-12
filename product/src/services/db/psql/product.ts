@@ -107,43 +107,87 @@ export class ProductService {
 		await this.client.query('CALL deleteAllContent()');
 	}
 
-	async findAllProducts(filerName: string, sorting: string): Promise<Products[]> {
-		const result = await this.client.query('SELECT * FROM findproducts($1,$2)', [
-			filerName,
-			sorting,
-		]);
+	async findAllProducts(orderName: string, sorting: string, exist: boolean): Promise<Products[]> {
+		let result: any;
+		if (exist) {
+			result = await this.client.query('SELECT * FROM findProductsExist($1,$2)', [
+				orderName,
+				sorting,
+			]);
+		} else {
+			result = await this.client.query('SELECT * FROM findProducts($1,$2)', [orderName, sorting]);
+		}
 		return result.rows;
 	}
 
 	async findProductsOfSubCategory(
 		subCategoryId: string,
-		filterName: string,
+		orderName: string,
 		sorting: string,
+		exist: boolean,
 	): Promise<Products[]> {
-		const result = await this.client.query('SELECT * FROM findProductsOfSubCategory($1,$2,$3)', [
-			subCategoryId,
-			filterName,
-			sorting,
-		]);
+		let result;
+		if (exist) {
+			result = await this.client.query('SELECT * FROM findProductsOfSubCategoryExist($1,$2,$3)', [
+				subCategoryId,
+				orderName,
+				sorting,
+			]);
+		} else {
+			result = await this.client.query('SELECT * FROM findProductsOfSubCategory($1,$2,$3)', [
+				subCategoryId,
+				orderName,
+				sorting,
+			]);
+		}
+
 		return result.rows;
 	}
 
 	async findProductsOfCategory(
 		categoryId: string,
-		filterName: string,
+		orderName: string,
 		sorting: string,
+		exist: boolean,
 	): Promise<Products[]> {
-		const result = await this.client.query('SELECT * FROM findProductsOfCategory($1,$2,$3)', [
-			categoryId,
-			filterName,
-			sorting,
-		]);
+		let result: any;
+		if (exist) {
+			result = await this.client.query('SELECT * FROM findProductsOfCategoryExist($1,$2,$3)', [
+				categoryId,
+				orderName,
+				sorting,
+			]);
+		} else {
+			result = await this.client.query('SELECT * FROM findProductsOfCategory($1,$2,$3)', [
+				categoryId,
+				orderName,
+				sorting,
+			]);
+		}
 
 		return result.rows;
 	}
 
-	async searchAllProducts(text: string): Promise<Products[]> {
-		const result = await this.client.query('SELECT * FROM searchAllProducts($1)', [text]);
+	async searchAllProducts(
+		text: string,
+		orderName: string,
+		sorting: string,
+		exist: boolean,
+	): Promise<Products[]> {
+		let result: any;
+		if (exist) {
+			result = await this.client.query('SELECT * FROM searchAllProductsExist($1,$2,$3)', [
+				text,
+				orderName,
+				sorting,
+			]);
+		} else {
+			result = await this.client.query('SELECT * FROM searchAllProducts($1,$2,$3)', [
+				text,
+				orderName,
+				sorting,
+			]);
+		}
 
 		return result.rows;
 	}

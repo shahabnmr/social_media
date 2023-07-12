@@ -134,6 +134,14 @@ export const insertBrandToSubCategory = async (subCategoryId: string, brandId: s
 		.expect(201);
 };
 
+export const insertColorToProduct = async (productId: string, colorId: string, amount: string) => {
+	await request(app).post('/api/v1/product/color_of_product/').send({
+		product_id: productId,
+		color_id: colorId,
+		amount: amount,
+	});
+};
+
 // export const signin = async () => {
 // const userService = await UserService.getInstance();
 

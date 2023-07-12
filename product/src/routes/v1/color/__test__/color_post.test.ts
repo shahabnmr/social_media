@@ -106,7 +106,7 @@ describe('insert_product_color', () => {
 			amount: '0',
 		});
 
-		expect(result.body.message).toEqual('insert successfl');
+		expect(result.body.message).toEqual('insert successful');
 	});
 
 	it('get 400 status code for product not exist', async () => {

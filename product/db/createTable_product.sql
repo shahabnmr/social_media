@@ -98,6 +98,26 @@ END;
 $$
 language plpgsql;
 
+CREATE OR REPLACE FUNCTION findProductsOfSubCategoryExist(subCategoryId_ text,
+													 columnname character varying, 
+													 sorting character varying)
+  RETURNS TABLE(id character varying, name text, price text, images text[],brand text,total bigint)
+AS
+$$
+BEGIN
+	RETURN QUERY EXECUTE format('
+    SELECT p.id, p.name, p.price, p.images, b.name as brand,SUM(pc.amount) AS total
+    FROM product.product p
+   	JOIN product.brand b ON b.id=p.brand
+		JOIN product.product_color pc ON pc.product_id=p.id
+		GROUP BY p.id,p.name,b.name		
+		HAVING SUM(pc.amount) > 0 AND p.sub_category_id=%L
+		ORDER BY p.%I %s;
+		',subCategoryId_,columnname,sorting);
+END;
+$$
+language plpgsql;
+
 CREATE OR REPLACE FUNCTION findProductsOfCategory(categoryId_ text,
 												 columnname character varying, 
 												 sorting character varying)
@@ -112,6 +132,27 @@ BEGIN
 	  	JOIN product.sub_category sb ON sb.id=p.sub_category_id
 	  	WHERE category_id=%L
 		  ORDER BY p.%I %s;
+		',categoryId_,columnname,sorting);
+END;
+$$
+language plpgsql;
+
+CREATE OR REPLACE FUNCTION findProductsOfCategoryExist(categoryId_ text,
+												 columnname character varying, 
+												 sorting character varying)
+  RETURNS TABLE(id character varying, name text, price text, images text[],brand text,total bigint)
+AS
+$$
+BEGIN
+	RETURN QUERY EXECUTE format('
+    SELECT p.id, p.name, p.price, p.images, b.name as brand,SUM(pc.amount) AS total
+    FROM product.product p
+    JOIN product.brand b ON b.id=p.brand
+	  JOIN product.sub_category sb ON sb.id=p.sub_category_id
+		JOIN product.product_color pc ON pc.product_id=p.id
+	  GROUP BY p.id,p.name,b.name,category_id	
+		HAVING SUM(pc.amount) > 0 AND category_id=%L
+		ORDER BY p.%I %s;
 		',categoryId_,columnname,sorting);
 END;
 $$
