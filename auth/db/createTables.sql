@@ -72,6 +72,21 @@ AS $$
     WHERE id=id_
 $$;
 
+CREATE OR REPLACE FUNCTION update_version_user(id_or_email_ text)
+RETURNS text AS
+$BODY$
+DECLARE version_ text;
+BEGIN
+	UPDATE auth.user
+    SET version=version + 1
+    WHERE id=id_or_email_ OR email=id_or_email_
+	RETURNING version INTO version_;
+	RETURN version_;
+END;
+$BODY$
+LANGUAGE plpgsql
+VOLATILE;
+
 CREATE OR REPLACE PROCEDURE reset_pass(id_ text, password_ text)
 LANGUAGE SQL
 AS $$

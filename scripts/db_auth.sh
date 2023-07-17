@@ -1,6 +1,6 @@
 sudo kill -9 `sudo lsof -t -i:5445`
 echo "Port forwarding for auth db on 5445"
-kubectl port-forward deployments/auth-psql-depl 5445:5432 &
+kubectl port-forward deployments/auth-postgres-depl 5445:5432 &
 sleep 1
 
 chmod 0600 ../auth/db/.pgpass;

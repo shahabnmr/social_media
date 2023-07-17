@@ -24,7 +24,9 @@ router.post('/api/v1/auth/signout', currentUser, async (req: Request, res: Respo
 	await user.updateOtp(decoded.otp_id, false);
 	req.session = null;
 
-	new SignOutPublisher(natsWrapper.client).publish({ email: currentUser!.email });
+	const version = await user.updateVersionUser(currentUser.id);
+
+	new SignOutPublisher(natsWrapper.client).publish({ email: currentUser!.email, version });
 
 	res.send({ message: 'signed out' });
 });

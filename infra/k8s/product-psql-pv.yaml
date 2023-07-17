@@ -2,28 +2,30 @@
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: product-psql-pv
+  name: product-postgres-pv
   labels:
     type: local
 spec:
   storageClassName: manual
   capacity:
-    storage: 100M
+    storage: 1Gi
   accessModes:
     - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
   hostPath:
-    path: '/mnt/data'
+    path: '/mnt/product_data'
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
     app: postgres
-  name: product-psql-pv-claim
+  name: product-postgres-pvc
 spec:
   storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 100M
+      storage: 1Gi
+  volumeName: product-postgres-pv

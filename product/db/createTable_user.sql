@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS product.user
     id text NOT NULL,
     email text NOT NULL,
     status boolean,
-    version integer DEFAULT 0,
+    version integer NOT NULL,
     createddate timestamp with time zone NOT NULL DEFAULT now(),
     updateddate timestamp with time zone NOT NULL DEFAULT now(),
     CONSTRAINT user_pkey PRIMARY KEY (id),
@@ -27,15 +27,32 @@ CREATE OR REPLACE TRIGGER updated_timestamp_user
     FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
 
+CREATE INDEX  index_user_email ON product.user(email DESC NULLS LAST);
 
-CREATE OR REPLACE PROCEDURE insert_user(id_ text, email_ text, status_ boolean)
+
+CREATE OR REPLACE PROCEDURE insert_user(id_ text, email_ text, status_ boolean, version_ integer)
 LANGUAGE SQL
 AS $$
-    INSERT INTO product.user(id,email,status) 
-    VALUES (id_, email_, status_)
+    INSERT INTO product.user(id,email,status, version) 
+    VALUES (id_, email_, status_,version_)
 $$;
 
-CREATE OR REPLACE FUNCTION findOneBrand(id_ text, email_ text)
+CREATE OR REPLACE FUNCTION update_user(email_ text ,status_ boolean,version_ integer)
+RETURNS text AS
+$BODY$
+DECLARE result_ text;
+BEGIN
+    UPDATE product.user
+    SET status=status_, version=version_
+    WHERE email=email_ AND version_=version + 1
+    RETURNING 'true' INTO result_;
+	  RETURN result_;
+END;
+$BODY$
+LANGUAGE plpgsql
+VOLATILE;
+
+CREATE OR REPLACE FUNCTION findOneUser(id_ text, email_ text)
   RETURNS SETOF product.user
 AS
 $$
