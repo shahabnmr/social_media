@@ -19,6 +19,9 @@ interface ENV {
 	JWT_KEY: string | undefined;
 	CRYPT_PASSWORD: string | undefined;
 	IV: string | undefined;
+	NATS_CLIENT_ID: string | undefined;
+	NATS_URL: string | undefined;
+	NATS_CLUSTER_ID: string | undefined;
 }
 
 interface Config {
@@ -32,6 +35,9 @@ interface Config {
 	JWT_KEY: string;
 	CRYPT_PASSWORD: string;
 	IV: string;
+	NATS_CLIENT_ID: string;
+	NATS_URL: string;
+	NATS_CLUSTER_ID: string;
 }
 
 // Loading process.env as ENV interface
@@ -79,6 +85,9 @@ const getConfig = (): ENV => {
 		JWT_KEY: process.env.JWT_KEY,
 		CRYPT_PASSWORD: process.env.CRYPT_PASSWORD,
 		IV: process.env.IV,
+		NATS_CLIENT_ID: process.env.NATS_CLIENT_ID,
+		NATS_CLUSTER_ID: process.env.NATS_CLUSTER_ID,
+		NATS_URL: process.env.NATS_URL,
 	};
 };
 

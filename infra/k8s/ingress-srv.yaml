@@ -17,3 +17,10 @@ spec:
                 name: smauth-srv
                 port:
                   number: 3000
+          - path: /api/v1/product/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: smproduct-srv
+                port:
+                  number: 3000

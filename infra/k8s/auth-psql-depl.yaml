@@ -1,35 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-psql-depl
+  name: auth-postgres-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth-psql
+      app: auth-postgres
   template:
     metadata:
       labels:
-        app: auth-psql
+        app: auth-postgres
     spec:
       containers:
-        - name: auth-psql
-          image: auth-postgres:0.1
+        - name: auth-postgres
+          image: postgres:1.1
+          env:
+            - name: POSTGRES_PASSWORD
+              value: '123.'
+            - name: POSTGRES_DB
+              value: social_media
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
-              name: auth-psql-pv-claim
+              name: auth-postgres-pvc
       volumes:
-        - name: auth-psql-pv-claim
+        - name: auth-postgres-pvc
           persistentVolumeClaim:
-            claimName: auth-psql-pv-claim
+            claimName: auth-postgres-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-psql-srv
+  name: auth-postgres-srv
 spec:
   selector:
-    app: auth-psql
+    app: auth-postgres
   ports:
     - name: db
       protocol: TCP

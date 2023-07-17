@@ -31,7 +31,7 @@ spec:
             - name: USER_PG
               value: 'postgres'
             - name: HOST_PG
-              value: 'auth-psql-srv'
+              value: 'auth-postgres-srv'
             - name: PORT_PG
               value: '5432'
             - name: DB_PG
