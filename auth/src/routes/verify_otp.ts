@@ -51,7 +51,7 @@ router.post('/api/v1/auth/verify/', async (req: Request, res: Response) => {
 
 					res.status(200).send({ user: user.id });
 				} else {
-					throw new BadRequestError('OTP not mached');
+					throw new BadRequestError('OTP not matched');
 				}
 			} else {
 				throw new BadRequestError('OTP expired');

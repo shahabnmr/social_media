@@ -26,7 +26,7 @@ chmod 0600 ./.pgpass;
 export PGPASSFILE="./.pgpass";
 
 echo "reading port variable for psql variable..."
-. ./.env
+. ./test.env
 
 echo "running db creation..."
 psql -h localhost -p ${PORT_PSQL} -U postgres -f ./createdb.sql

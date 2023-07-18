@@ -1,36 +1,38 @@
 import request from 'supertest';
 import { app } from '../../app';
 import { signin } from '../../test/setup';
-import { UserService } from '../../services/db/psql/user';
 
-let userService;
 const email = 'test@test.com';
-beforeEach(() => {
-	jest.spyOn(global, 'Date').mockImplementationOnce(() => new Date('2021-09-12T11:01:58.135Z'));
-});
+describe('resend otp', () => {
+	it('return 400, first signin', async () => {
+		await request(app).post('/api/v1/auth/resendotp').send().expect(400);
+	});
 
-afterEach(async () => {
-	userService = await UserService.getInstance();
-	const user = await userService.findOne(email, '', '');
+	it('return 400, last otp have expiration time', async () => {
+		const { cookie } = await signin();
+		await request(app).post('/api/v1/auth/resendotp').set('Cookie', cookie).send().expect(400);
+	});
 
-	if (user) {
-		const otp = await userService.findOneOtp('', user.id);
-		otp ? await userService.deleteOtp(otp.id) : '';
-		await userService.deleteUser(email);
-	}
-});
+	it('return 200,after 10 minutes can use resend otp', async () => {
+		jest
+			.spyOn(global.Date, 'now')
+			.mockImplementationOnce(() => new Date('2019-05-14T11:01:58.135Z').valueOf());
 
-it('return 400, first signin', async () => {
-	await request(app).post('/api/v1/auth/resendotp').send().expect(400);
-});
+		const email = 'test@test.com';
 
-it('return 400, last otp have expiration time', async () => {
-	const { cookie } = await signin();
-	await request(app).post('/api/v1/auth/resendotp').set('Cookie', cookie).send().expect(400);
-});
+		const res = await request(app)
+			.post('/api/v1/auth/signup')
+			.send({
+				name: 'shahab',
+				family: 'asd',
+				tell: '01234567891',
+				email,
+				password: '123qwe',
+				confirmPassword: '123qwe',
+			})
+			.expect(201);
 
-it('return 200,we have to wait 10 minutes ,and resend otp', async () => {
-	const { cookie } = await signin();
-
-	await request(app).post('/api/v1/auth/resendotp').set('Cookie', cookie).send().expect(200);
+		const details = res.get('Set-Cookie');
+		await request(app).post('/api/v1/auth/resendotp').set('Cookie', details).send().expect(200);
+	});
 });

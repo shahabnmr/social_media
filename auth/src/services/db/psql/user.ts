@@ -133,4 +133,11 @@ export class UserService {
 	async deleteOtp(id: string) {
 		await this.client.query('CALL delete_otp_id($1)', [id]);
 	}
+
+	async deleteAllContent() {
+		await this.client.query('CALL deleteAllContent()');
+	}
+	async end() {
+		await this.client.end();
+	}
 }

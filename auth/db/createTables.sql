@@ -162,3 +162,11 @@ $$
     WHERE id=id_ OR userid=userid_ LIMIT 1;
 $$
 language sql;
+
+CREATE OR REPLACE PROCEDURE deleteAllContent()
+AS
+$$
+    TRUNCATE auth.user,auth.otp
+		CASCADE;
+$$
+language sql;
