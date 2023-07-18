@@ -8,7 +8,7 @@
 		"start:prod": "cd ./scripts && ./run_auth_pub.sh",
 		"dev": "export NODE_ENV=dev && cd ./db && ./createTables.sh && cd .. && ts-node-dev src/index.ts",
 		"test": "jest --watchAll --no-cache --detectOpenHandles",
-		"test:ci": "jest"
+		"test:ci": "jest --detectOpenHandles"
 	},
 	"jest": {
 		"preset": "ts-jest",

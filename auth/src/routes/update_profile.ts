@@ -22,12 +22,15 @@ router.put(
 		body('email').isEmail().withMessage('email must be valid'),
 	],
 	validateRequest,
+	currentUser,
 	async (req: Request, res: Response) => {
 		const userService = await UserService.getInstance();
 		const { email, tell, name, family } = req.body;
 
-		const userId = req.currentUser!.id;
-
+		if (!req.currentUser) {
+			throw new BadRequestError('you must sign in or sign up first');
+		}
+		const userId = req.currentUser.id;
 		const user = await userService.findOne('', '', userId);
 
 		if (!user) throw new BadRequestError('user Not found');

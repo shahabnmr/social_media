@@ -22,8 +22,7 @@ router.post('/api/v1/auth/resendotp', async (req: Request, res: Response) => {
 	const userService = await UserService.getInstance();
 
 	const lastOtp = await userService.findOneOtp('', decoded.userId);
-
-	console.log(new Date(), 'sssssssssssssssssssssssss');
+	const date__ = Date.now();
 
 	if (new Date(lastOtp.expiration_time) > new Date())
 		throw new BadRequestError('last otp have expiration time');
