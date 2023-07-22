@@ -7,6 +7,7 @@ import { BrandService } from '../services/db/psql/brand';
 import { CategoryService } from '../services/db/psql/category';
 import { ColorService } from '../services/db/psql/color';
 import { SubCategoryService } from '../services/db/psql/sub_category';
+import { UserService } from '../services/db/psql/user';
 
 jest.mock('../nats-wrapper');
 jest.setTimeout(601999);
@@ -15,6 +16,7 @@ let color: any;
 let subCategory: any;
 let product: any;
 let brand: any;
+let user: any;
 
 beforeAll(async () => {
 	brand = await BrandService.getInstance();
@@ -22,6 +24,7 @@ beforeAll(async () => {
 	color = await ColorService.getInstance();
 	subCategory = await SubCategoryService.getInstance();
 	product = await ProductService.getInstance();
+	user = await UserService.getInstance();
 
 	process.env.TZ = 'EST';
 	process.env.NATS_CLIENT_ID = 'dsadasdasas';
@@ -42,6 +45,7 @@ afterAll(async () => {
 	await category.end();
 	await color.end();
 	await subCategory.end();
+	await user.end();
 });
 
 export const insertCategory = async (name: string) => {

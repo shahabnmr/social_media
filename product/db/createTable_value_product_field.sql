@@ -97,7 +97,8 @@ $$
 				product.brand,
 				product.brand_sub_category,
 				product.color,
-				product.sub_category_field
+				product.sub_category_field,
+				product.user
 		CASCADE;
 $$
 language sql;
