@@ -8,6 +8,7 @@ import {
 	insertFieldsSubCategory,
 	insertSubCategory,
 } from '../../../../test/setup';
+import { natsWrapper } from '../../../../nats-wrapper';
 
 describe('insert product', () => {
 	it('get 201 status code for insert product', async () => {
@@ -31,6 +32,29 @@ describe('insert product', () => {
 
 		expect(result.body.product.name).toEqual('z5 laptop');
 		expect(result.body.product.description).toEqual('this is a good laptop');
+	});
+
+	it('emit event product created', async () => {
+		const category = await insertCategory('electronic');
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const field = await insertField('ram');
+		const brand = await insertBrand('sony');
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+
+		const result = await request(app)
+			.post('/api/v1/product/')
+			.send({
+				name: 'z5 laptop',
+				description: 'this is a good laptop',
+				price: '155',
+				sub_category_id: subCategory.body.subCategoryId,
+				fields: [{ fieldId: field.body.fieldId, value: '256' }],
+				brandId: brand.body.brandId,
+			});
+
+		expect(result.body.product.name).toEqual('z5 laptop');
+		expect(natsWrapper.client.publish).toHaveBeenCalled();
 	});
 
 	it('get 400 status code for insert incorrect name or description or price or sub_category_id or fields or brands', async () => {
@@ -105,23 +129,27 @@ describe('insert product', () => {
 		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
 		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
 
-		await request(app).post('/api/v1/product/').send({
-			name: 'z5 laptop',
-			description: 'this is a good laptop',
-			price: '155',
-			sub_category_id: subCategory.body.subCategoryId,
-			fields: [{ fieldId: field.body.fieldId, value: '256' }],
-			brandId: brand.body.brandId,
-		});
+		await request(app)
+			.post('/api/v1/product/')
+			.send({
+				name: 'z5 laptop',
+				description: 'this is a good laptop',
+				price: '155',
+				sub_category_id: subCategory.body.subCategoryId,
+				fields: [{ fieldId: field.body.fieldId, value: '256' }],
+				brandId: brand.body.brandId,
+			});
 
-		const result = await request(app).post('/api/v1/product/').send({
-			name: 'z5 laptop',
-			description: 'this is a good laptop',
-			price: '155',
-			sub_category_id: subCategory.body.subCategoryId,
-			fields: [{ fieldId: field.body.fieldId, value: '256' }],
-			brandId: brand.body.brandId,
-		});
+		const result = await request(app)
+			.post('/api/v1/product/')
+			.send({
+				name: 'z5 laptop',
+				description: 'this is a good laptop',
+				price: '155',
+				sub_category_id: subCategory.body.subCategoryId,
+				fields: [{ fieldId: field.body.fieldId, value: '256' }],
+				brandId: brand.body.brandId,
+			});
 
 		expect(result.body.errors[0].message).toEqual('this product name already exist: z5 laptop');
 	});

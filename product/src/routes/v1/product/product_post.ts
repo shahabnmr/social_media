@@ -5,6 +5,8 @@ import { BadRequestError, validateRequest } from '@sn_common/common';
 import { Product, ProductService } from '../../../services/db/psql/product';
 import { SubCategoryService } from '../../../services/db/psql/sub_category';
 import { BrandService } from '../../../services/db/psql/brand';
+import { ProductCreatedPublisher } from '../../../events/publishers/product-created-publisher';
+import { natsWrapper } from '../../../nats-wrapper';
 
 const router = express.Router();
 
@@ -75,6 +77,13 @@ router.post(
 		product.id = await productService.insertProduct(product);
 
 		await productService.insertValuesOfFields(product);
+
+		await new ProductCreatedPublisher(natsWrapper.client).publish({
+			id: product.id,
+			version: 0,
+			name: product.name,
+			price: product.price,
+		});
 
 		res.status(201).send({ product });
 	},
