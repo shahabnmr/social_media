@@ -14,7 +14,8 @@ export class SignInListener extends Listener<SignInEvent> {
 		const userService = await UserService.getInstance();
 		const user = await userService.findOne('', email);
 		if (!user) {
-			result = await userService.insert({ email, version, status: true });
+			result = await userService.insert({ email, version: 0, status: true });
+
 			msg.ack();
 		} else {
 			result = await userService.update(email, true, Math.floor(version));
