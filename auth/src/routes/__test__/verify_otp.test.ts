@@ -7,7 +7,7 @@ import otpGenerate from 'otp-generator';
 const email = 'asdadal@gmail.com';
 
 describe('verify otp', () => {
-	it('verify otp and get 200 status code and get userId', async () => {
+	it('verify otp and get 200 status code and get userId and emit event signup', async () => {
 		const spyOtp = jest.spyOn(otpGenerate, 'generate').mockReturnValue('asd123');
 
 		const signup = await request(app)
@@ -31,6 +31,7 @@ describe('verify otp', () => {
 			.expect(200);
 		expect(typeof result.body.user).toEqual('string');
 		expect(result.body.user).toHaveLength(36);
+		expect(natsWrapper.client.publish).toHaveBeenCalled();
 	});
 
 	it('get status 400, otp not matched', async () => {

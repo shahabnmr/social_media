@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app } from '../../app';
 import { signin } from '../../test/setup';
+import { natsWrapper } from '../../nats-wrapper';
 
 const email = 'test@test.com';
 describe('sign out', () => {
@@ -16,5 +17,12 @@ describe('sign out', () => {
 	it('successful signout', async () => {
 		const { cookie } = await signin();
 		await request(app).post('/api/v1/auth/signout').set('Cookie', cookie).send().expect(200);
+	});
+
+	it('emit event signup', async () => {
+		const { cookie } = await signin();
+		await request(app).post('/api/v1/auth/signout').set('Cookie', cookie).send().expect(200);
+
+		expect(natsWrapper.client.publish).toHaveBeenCalled();
 	});
 });
