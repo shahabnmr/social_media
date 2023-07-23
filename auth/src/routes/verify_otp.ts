@@ -47,7 +47,10 @@ router.post('/api/v1/auth/verify/', async (req: Request, res: Response) => {
 					// update version in psql and send version with email
 					const version = await userService.updateVersionUser(user.id);
 
-					new SignInPublisher(natsWrapper.client).publish({ email: user.email, version });
+					new SignInPublisher(natsWrapper.client).publish({
+						email: user.email,
+						version,
+					});
 
 					res.status(200).send({ user: user.id });
 				} else {

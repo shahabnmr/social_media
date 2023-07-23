@@ -8,6 +8,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE TYPE rolls_type AS ENUM ('user', 'admin', 'seller');
+
 CREATE TABLE IF NOT EXISTS auth.user
 (
     id character varying NOT NULL,
@@ -16,6 +18,7 @@ CREATE TABLE IF NOT EXISTS auth.user
     family text NOT NULL,
     tell text,
     password text,
+    roll rolls_type DEFAULT 'user',
     createddate timestamp with time zone NOT NULL DEFAULT now(),
     updateddate timestamp with time zone NOT NULL DEFAULT now(),
     version integer DEFAULT 0,
@@ -70,6 +73,14 @@ AS $$
     UPDATE auth.user
     SET email=email_, tell=tell_, name=name_, family=family_
     WHERE id=id_
+$$;
+
+CREATE OR REPLACE PROCEDURE update_roll(email_ text,roll_ rolls_type)
+LANGUAGE SQL
+AS $$
+    UPDATE auth.user
+    SET roll=roll_
+    WHERE email=email_
 $$;
 
 CREATE OR REPLACE FUNCTION update_version_user(id_or_email_ text)

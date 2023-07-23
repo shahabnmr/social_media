@@ -8,12 +8,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE TYPE rolls_type AS ENUM ('user', 'admin', 'seller');
+
 CREATE TABLE IF NOT EXISTS product.user
 (
     id text NOT NULL,
     email text NOT NULL,
     status boolean,
     version integer NOT NULL,
+    roll rolls_type DEFAULT 'user',
     createddate timestamp with time zone NOT NULL DEFAULT now(),
     updateddate timestamp with time zone NOT NULL DEFAULT now(),
     CONSTRAINT user_pkey PRIMARY KEY (id),

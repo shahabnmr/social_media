@@ -21,6 +21,7 @@ router.get('/api/v1/auth/profile', currentUser, async (req: Request, res: Respon
 			tell: user.tell,
 			name: user.name,
 			family: user.family,
+			roll: user.roll,
 		},
 	});
 });
