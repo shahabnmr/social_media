@@ -18,5 +18,6 @@ describe('get profile', () => {
 
 		expect(res.body.user.email).toEqual('test@test.com');
 		expect(res.body.user.tell).toEqual('01234567891');
+		expect(res.body.user.roll).toEqual('user');
 	});
 });

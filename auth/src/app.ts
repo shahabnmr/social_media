@@ -17,6 +17,7 @@ import { resetPasswordRouter } from './routes/reset_password';
 import { getProfileRouter } from './routes/get_profiel';
 import { updateProfileRouter } from './routes/update_profile';
 import { resendOtp } from './routes/resend_otp';
+import { updateRollRouter } from './routes/update_roll';
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use(resetPasswordRouter);
 app.use(getProfileRouter);
 app.use(updateProfileRouter);
 app.use(resendOtp);
+app.use(updateRollRouter);
 
 app.all('*', async (req, res) => {
 	throw new NotFoundError();

@@ -3,6 +3,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { DatabaseConnectionError } from '@sn_common/common';
 import { Password } from '../../password/password';
 
+export enum Roll {
+	User = 'user',
+	Admin = 'admin',
+}
 interface User {
 	id: string;
 	email: string;
@@ -10,6 +14,7 @@ interface User {
 	name: string;
 	family: string;
 	password: string;
+	roll: Roll;
 }
 
 interface Otp {
@@ -51,7 +56,7 @@ export class UserService {
 
 	async findOne(email: string, tell: string, id: string): Promise<User> {
 		const result = await this.client.query(
-			'select id,email,tell,name,family,password from findOne_user($1,$2,$3)',
+			'select id,email,tell,name,family,password,roll from findOne_user($1,$2,$3)',
 			[email, tell, id],
 		);
 
@@ -132,6 +137,11 @@ export class UserService {
 
 	async deleteOtp(id: string) {
 		await this.client.query('CALL delete_otp_id($1)', [id]);
+	}
+
+	async updateRoll(email: string, roll: Roll): Promise<string> {
+		await this.client.query('CALL update_roll($1,$2)', [email, roll]);
+		return 'updated';
 	}
 
 	async deleteAllContent() {
