@@ -55,6 +55,21 @@ $BODY$
 LANGUAGE plpgsql
 VOLATILE;
 
+CREATE OR REPLACE FUNCTION update_user_roll(email_ text ,roll_ rolls_type,version_ integer)
+RETURNS text AS
+$BODY$
+DECLARE result_ text;
+BEGIN
+    UPDATE product.user
+    SET roll=roll_, version=version_
+    WHERE email=email_ AND version_=version + 1
+    RETURNING 'true' INTO result_;
+	  RETURN result_;
+END;
+$BODY$
+LANGUAGE plpgsql
+VOLATILE;
+
 CREATE OR REPLACE FUNCTION findOneUser(id_ text, email_ text)
   RETURNS SETOF product.user
 AS
