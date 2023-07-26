@@ -1,11 +1,12 @@
 import request from 'supertest';
 import { app } from '../../../../app';
-import { insertCategory } from '../../../../test/setup';
+import { insertCategory, signin } from '../../../../test/setup';
 
 describe('get list of all categories', () => {
 	it('get 200 status code, and list of categories', async () => {
-		await insertCategory('electronic');
-		await insertCategory('clothes');
+		const cookie = await signin();
+		await insertCategory('electronic', cookie);
+		await insertCategory('clothes', cookie);
 
 		const result = await request(app).get('/api/v1/product/categories/get-all');
 

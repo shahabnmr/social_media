@@ -9,18 +9,22 @@ import {
 	insertSubCategory,
 } from '../../../../test/setup';
 import { natsWrapper } from '../../../../nats-wrapper';
+import { signin } from '../../../../test/setup';
+import { cookie } from 'express-validator';
 
 describe('insert product', () => {
 	it('get 201 status code for insert product', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 
 		const result = await request(app)
 			.post('/api/v1/product/')
+			.set('Cookie', cookie)
 			.send({
 				name: 'z5 laptop',
 				description: 'this is a good laptop',
@@ -34,16 +38,41 @@ describe('insert product', () => {
 		expect(result.body.product.description).toEqual('this is a good laptop');
 	});
 
-	it('emit event product created', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+	it('get 401 status code for unauthorized', async () => {
+		const cookie = await signin();
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 
 		const result = await request(app)
 			.post('/api/v1/product/')
+			.send({
+				name: 'z5 laptop',
+				description: 'this is a good laptop',
+				price: '155',
+				sub_category_id: subCategory.body.subCategoryId,
+				fields: [{ fieldId: field.body.fieldId, value: '256' }],
+				brandId: brand.body.brandId,
+			});
+
+		expect(result.body.errors[0].message).toEqual('Not authorized');
+	});
+
+	it('emit event product created', async () => {
+		const cookie = await signin();
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
+
+		const result = await request(app)
+			.post('/api/v1/product/')
+			.set('Cookie', cookie)
 			.send({
 				name: 'z5 laptop',
 				description: 'this is a good laptop',
@@ -58,7 +87,8 @@ describe('insert product', () => {
 	});
 
 	it('get 400 status code for insert incorrect name or description or price or sub_category_id or fields or brands', async () => {
-		const result = await request(app).post('/api/v1/product/').send({
+		const cookie = await signin();
+		const result = await request(app).post('/api/v1/product/').set('Cookie', cookie).send({
 			name: '',
 			description: '',
 			price: '',
@@ -75,16 +105,18 @@ describe('insert product', () => {
 	});
 
 	it('get 400 status code for insert product with this subCategory not have this brand', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const anotherSubCategory = await insertSubCategory('mobile', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const anotherSubCategory = await insertSubCategory('mobile', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 
 		const result = await request(app)
 			.post('/api/v1/product/')
+			.set('Cookie', cookie)
 			.send({
 				name: 'z5 laptop',
 				description: 'this is a good laptop',
@@ -98,15 +130,17 @@ describe('insert product', () => {
 	});
 
 	it('get 400 status code for insert product with incorrect fieldId', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 
 		const result = await request(app)
 			.post('/api/v1/product/')
+			.set('Cookie', cookie)
 			.send({
 				name: 'z5 laptop',
 				description: 'this is a good laptop',
@@ -122,15 +156,17 @@ describe('insert product', () => {
 	});
 
 	it('get 400 status code for insert product if name be duplicated', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 
 		await request(app)
 			.post('/api/v1/product/')
+			.set('Cookie', cookie)
 			.send({
 				name: 'z5 laptop',
 				description: 'this is a good laptop',
@@ -142,6 +178,7 @@ describe('insert product', () => {
 
 		const result = await request(app)
 			.post('/api/v1/product/')
+			.set('Cookie', cookie)
 			.send({
 				name: 'z5 laptop',
 				description: 'this is a good laptop',

@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
-import { BadRequestError, currentUser, validateRequest } from '@sn_common/common';
+import { BadRequestError, currentUser, requireAuth, validateRequest } from '@sn_common/common';
 
 import { UserService } from '../services/db/psql/user';
 
@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.put(
 	'/api/v1/auth/profile',
-	currentUser,
+	requireAuth,
 	[
 		body('name')
 			.isString()
@@ -22,15 +22,11 @@ router.put(
 		body('email').isEmail().withMessage('email must be valid'),
 	],
 	validateRequest,
-	currentUser,
 	async (req: Request, res: Response) => {
 		const userService = await UserService.getInstance();
 		const { email, tell, name, family } = req.body;
 
-		if (!req.currentUser) {
-			throw new BadRequestError('you must sign in or sign up first');
-		}
-		const userId = req.currentUser.id;
+		const userId = req.currentUser!.id;
 		const user = await userService.findOne('', '', userId);
 
 		if (!user) throw new BadRequestError('user Not found');

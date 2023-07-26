@@ -10,16 +10,18 @@ import {
 	insertFieldsSubCategory,
 	insertProduct,
 	insertSubCategory,
+	signin,
 } from '../../../../test/setup';
 
 describe('get product', () => {
 	it('get 200 status code and product info', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 		const product = await insertProduct(
 			'name 1',
 			'abcd',
@@ -27,6 +29,7 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
 
 		const result = await request(app).get(`/api/v1/product/product/${product.body.product.id}`);
@@ -41,12 +44,13 @@ describe('get product', () => {
 	});
 
 	it('get all products', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 		const product1 = await insertProduct(
 			'name 1',
 			'abcd',
@@ -54,6 +58,7 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
 		const product2 = await insertProduct(
 			'name 2',
@@ -62,6 +67,7 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
 
 		const result = await request(app)
@@ -73,12 +79,13 @@ describe('get product', () => {
 	});
 
 	it('get all product of subCategory', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 		const product1 = await insertProduct(
 			'name 1',
 			'abcd',
@@ -86,6 +93,7 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
 
 		const product2 = await insertProduct(
@@ -95,14 +103,15 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
 
-		const category1 = await insertCategory('clothes');
-		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId);
-		const field1 = await insertField('height');
-		const brand1 = await insertBrand('adidas');
-		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId);
-		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId);
+		const category1 = await insertCategory('clothes', cookie);
+		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId, cookie);
+		const field1 = await insertField('height', cookie);
+		const brand1 = await insertBrand('adidas', cookie);
+		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId, cookie);
 		const product3 = await insertProduct(
 			'clothes1',
 			'abcd',
@@ -110,6 +119,7 @@ describe('get product', () => {
 			subCategory1.body.subCategoryId,
 			field1.body.fieldId,
 			brand1.body.brandId,
+			cookie,
 		);
 
 		const result = await request(app)
@@ -123,13 +133,15 @@ describe('get product', () => {
 	});
 
 	it('get all product of subCategory Exist', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		const color = await insertColor('blue', '#123456');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		const color = await insertColor('blue', '#123456', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 		const product1 = await insertProduct(
 			'name 1',
 			'abcd',
@@ -137,8 +149,9 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
-		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0');
+		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0', cookie);
 
 		const product2 = await insertProduct(
 			'name 2',
@@ -147,15 +160,16 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
-		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2');
+		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2', cookie);
 
-		const category1 = await insertCategory('clothes');
-		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId);
-		const field1 = await insertField('height');
-		const brand1 = await insertBrand('adidas');
-		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId);
-		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId);
+		const category1 = await insertCategory('clothes', cookie);
+		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId, cookie);
+		const field1 = await insertField('height', cookie);
+		const brand1 = await insertBrand('adidas', cookie);
+		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId, cookie);
 		const product3 = await insertProduct(
 			'clothes1',
 			'abcd',
@@ -163,6 +177,7 @@ describe('get product', () => {
 			subCategory1.body.subCategoryId,
 			field1.body.fieldId,
 			brand1.body.brandId,
+			cookie,
 		);
 
 		const result = await request(app)
@@ -175,12 +190,14 @@ describe('get product', () => {
 	});
 
 	it('get all product of category', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 		const product1 = await insertProduct(
 			'name 1',
 			'abcd',
@@ -188,6 +205,7 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
 
 		const product2 = await insertProduct(
@@ -197,14 +215,15 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
 
-		const category1 = await insertCategory('clothes');
-		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId);
-		const field1 = await insertField('height');
-		const brand1 = await insertBrand('adidas');
-		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId);
-		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId);
+		const category1 = await insertCategory('clothes', cookie);
+		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId, cookie);
+		const field1 = await insertField('height', cookie);
+		const brand1 = await insertBrand('adidas', cookie);
+		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId, cookie);
 		const product3 = await insertProduct(
 			'clothes1',
 			'abcd',
@@ -212,6 +231,7 @@ describe('get product', () => {
 			subCategory1.body.subCategoryId,
 			field1.body.fieldId,
 			brand1.body.brandId,
+			cookie,
 		);
 
 		const result = await request(app)
@@ -225,13 +245,15 @@ describe('get product', () => {
 	});
 
 	it('get all product of category exist', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		const color = await insertColor('blue', '#123456');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		const color = await insertColor('blue', '#123456', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 		const product1 = await insertProduct(
 			'name 1',
 			'abcd',
@@ -239,8 +261,9 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
-		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0');
+		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0', cookie);
 
 		const product2 = await insertProduct(
 			'name 2',
@@ -249,15 +272,16 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
-		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2');
+		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2', cookie);
 
-		const category1 = await insertCategory('clothes');
-		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId);
-		const field1 = await insertField('height');
-		const brand1 = await insertBrand('adidas');
-		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId);
-		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId);
+		const category1 = await insertCategory('clothes', cookie);
+		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId, cookie);
+		const field1 = await insertField('height', cookie);
+		const brand1 = await insertBrand('adidas', cookie);
+		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId, cookie);
 		const product3 = await insertProduct(
 			'clothes1',
 			'abcd',
@@ -265,6 +289,7 @@ describe('get product', () => {
 			subCategory1.body.subCategoryId,
 			field1.body.fieldId,
 			brand1.body.brandId,
+			cookie,
 		);
 
 		const result = await request(app)
@@ -277,12 +302,14 @@ describe('get product', () => {
 	});
 
 	it('search all product', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 		const product1 = await insertProduct(
 			'this is name one',
 			'this is description good',
@@ -290,6 +317,7 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
 
 		const product2 = await insertProduct(
@@ -299,14 +327,15 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
 
-		const category1 = await insertCategory('clothes');
-		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId);
-		const field1 = await insertField('height');
-		const brand1 = await insertBrand('adidas');
-		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId);
-		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId);
+		const category1 = await insertCategory('clothes', cookie);
+		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId, cookie);
+		const field1 = await insertField('height', cookie);
+		const brand1 = await insertBrand('adidas', cookie);
+		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId, cookie);
 		const product3 = await insertProduct(
 			'my name is good clothes',
 			'description is for test thats it',
@@ -314,6 +343,7 @@ describe('get product', () => {
 			subCategory1.body.subCategoryId,
 			field1.body.fieldId,
 			brand1.body.brandId,
+			cookie,
 		);
 
 		const result = await request(app)
@@ -326,13 +356,15 @@ describe('get product', () => {
 	});
 
 	it('search all product exist', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		const color = await insertColor('blue', '#123456');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		const color = await insertColor('blue', '#123456', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 		const product1 = await insertProduct(
 			'this is name one',
 			'this is description good',
@@ -340,8 +372,9 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
-		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0');
+		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0', cookie);
 
 		const product2 = await insertProduct(
 			'my name is ali and jafar',
@@ -350,15 +383,16 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
-		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2');
+		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2', cookie);
 
-		const category1 = await insertCategory('clothes');
-		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId);
-		const field1 = await insertField('height');
-		const brand1 = await insertBrand('adidas');
-		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId);
-		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId);
+		const category1 = await insertCategory('clothes', cookie);
+		const subCategory1 = await insertSubCategory('T-shirt', category1.body.categoryId, cookie);
+		const field1 = await insertField('height', cookie);
+		const brand1 = await insertBrand('adidas', cookie);
+		await insertBrandToSubCategory(subCategory1.body.subCategoryId, brand1.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory1.body.subCategoryId, field1.body.fieldId, cookie);
 		const product3 = await insertProduct(
 			'my name is good clothes',
 			'description is for test thats it',
@@ -366,6 +400,7 @@ describe('get product', () => {
 			subCategory1.body.subCategoryId,
 			field1.body.fieldId,
 			brand1.body.brandId,
+			cookie,
 		);
 
 		const result = await request(app)
@@ -377,13 +412,15 @@ describe('get product', () => {
 	});
 
 	it('get all products Exist', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const field = await insertField('ram');
-		const brand = await insertBrand('sony');
-		const color = await insertColor('blue', '#123456');
-		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId);
-		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId);
+		const cookie = await signin();
+
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		const color = await insertColor('blue', '#123456', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
 		const product1 = await insertProduct(
 			'name 1',
 			'abcd',
@@ -391,8 +428,9 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
-		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0');
+		await insertColorToProduct(product1.body.product.id, color.body.colorId, '0', cookie);
 		const product2 = await insertProduct(
 			'name 2',
 			'abcd',
@@ -400,8 +438,9 @@ describe('get product', () => {
 			subCategory.body.subCategoryId,
 			field.body.fieldId,
 			brand.body.brandId,
+			cookie,
 		);
-		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2');
+		await insertColorToProduct(product2.body.product.id, color.body.colorId, '2', cookie);
 
 		const result = await request(app)
 			.get('/api/v1/product/products')

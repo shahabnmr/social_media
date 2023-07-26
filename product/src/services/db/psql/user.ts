@@ -1,12 +1,13 @@
 import Dbservice from '../common/postgres/db.service';
 import { v4 as uuidv4 } from 'uuid';
-import { BadRequestError, DatabaseConnectionError, NotFoundError } from '@sn_common/common';
+import { BadRequestError, DatabaseConnectionError, NotFoundError, Roll } from '@sn_common/common';
 
 interface User {
 	id?: string;
 	email: string;
 	version: number;
 	status: boolean;
+	roll?: Roll;
 	createddate?: Date;
 	updateddate?: Date;
 }
@@ -59,8 +60,6 @@ export class UserService {
 	}
 
 	async update(email: string, status: boolean, version: number) {
-		console.log({ version });
-
 		const user = await this.client.query('SELECT * FROM update_user($1,$2,$3)', [
 			email,
 			status,
@@ -68,6 +67,25 @@ export class UserService {
 		]);
 
 		return user.rows[0].update_user;
+	}
+
+	async updateRoll(email: string, roll: Roll, version: number): Promise<string> {
+		const result = await this.client.query('SELECT * FROM update_user_roll($1,$2,$3)', [
+			email,
+			roll,
+			version,
+		]);
+
+		return result.rows[0].update_user_roll;
+	}
+
+	async isAdmin(email: string): Promise<boolean> {
+		const user = await this.findOne('', email);
+		if (user.roll === 'admin') {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	async end() {

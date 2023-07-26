@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { app } from '../app';
 import request from 'supertest';
-import Dbservice from '../services/db/common/postgres/db.service';
+import { v4 as uuidv4 } from 'uuid';
 import { ProductService } from '../services/db/psql/product';
 import { BrandService } from '../services/db/psql/brand';
 import { CategoryService } from '../services/db/psql/category';
@@ -48,18 +48,24 @@ afterAll(async () => {
 	await user.end();
 });
 
-export const insertCategory = async (name: string) => {
+export const insertCategory = async (name: string, cookie: string[]) => {
 	return await request(app)
 		.post('/api/v1/product/category/')
+		.set('Cookie', cookie)
 		.send({
 			name,
 		})
 		.expect(201);
 };
 
-export const insertSubCategory = async (nameSubCategory: string, categoryId: string) => {
+export const insertSubCategory = async (
+	nameSubCategory: string,
+	categoryId: string,
+	cookie: string[],
+) => {
 	return await request(app)
 		.post('/api/v1/product/sub_category')
+		.set('Cookie', cookie)
 		.send({
 			name: nameSubCategory,
 			category_id: categoryId,
@@ -67,9 +73,10 @@ export const insertSubCategory = async (nameSubCategory: string, categoryId: str
 		.expect(201);
 };
 
-export const insertBrand = async (brandName: string) => {
+export const insertBrand = async (brandName: string, cookie: string[]) => {
 	return await request(app)
 		.post('/api/v1/product/brand/insert/')
+		.set('Cookie', cookie)
 		.send({
 			name: brandName,
 			description: 'this is sony brand',
@@ -77,9 +84,10 @@ export const insertBrand = async (brandName: string) => {
 		.expect(201);
 };
 
-export const insertField = async (nameField: string) => {
+export const insertField = async (nameField: string, cookie: string[]) => {
 	return await request(app)
 		.post('/api/v1/product/sub_category/field')
+		.set('Cookie', cookie)
 		.send({
 			name: nameField,
 			type: 'text',
@@ -88,9 +96,10 @@ export const insertField = async (nameField: string) => {
 		.expect(201);
 };
 
-export const insertColor = async (nameColor: string, codeColor: string) => {
+export const insertColor = async (nameColor: string, codeColor: string, cookie: string[]) => {
 	return await request(app)
 		.post('/api/v1/product/color')
+		.set('Cookie', cookie)
 		.send({
 			name: nameColor,
 			code_color: codeColor,
@@ -98,9 +107,14 @@ export const insertColor = async (nameColor: string, codeColor: string) => {
 		.expect(201);
 };
 
-export const insertFieldsSubCategory = async (subCategoryId: string, fieldId: string) => {
+export const insertFieldsSubCategory = async (
+	subCategoryId: string,
+	fieldId: string,
+	cookie: string[],
+) => {
 	return await request(app)
 		.post('/api/v1/product/sub_category/add-fields')
+		.set('Cookie', cookie)
 		.send({
 			subCategory_id: subCategoryId,
 			field_ids: [fieldId],
@@ -115,9 +129,11 @@ export const insertProduct = async (
 	subCategoryId: string,
 	fieldId: string,
 	brandId: string,
+	cookie: string[],
 ) => {
 	return await request(app)
 		.post('/api/v1/product/')
+		.set('Cookie', cookie)
 		.send({
 			name,
 			description: description,
@@ -128,9 +144,14 @@ export const insertProduct = async (
 		});
 };
 
-export const insertBrandToSubCategory = async (subCategoryId: string, brandId: string) => {
+export const insertBrandToSubCategory = async (
+	subCategoryId: string,
+	brandId: string,
+	cookie: string[],
+) => {
 	return await request(app)
 		.post('/api/v1/product/brand/insert/to_sub_category/')
+		.set('Cookie', cookie)
 		.send({
 			sub_category_id: subCategoryId,
 			brands: [brandId],
@@ -138,46 +159,39 @@ export const insertBrandToSubCategory = async (subCategoryId: string, brandId: s
 		.expect(201);
 };
 
-export const insertColorToProduct = async (productId: string, colorId: string, amount: string) => {
-	await request(app).post('/api/v1/product/color_of_product/').send({
+export const insertColorToProduct = async (
+	productId: string,
+	colorId: string,
+	amount: string,
+	cookie: string[],
+) => {
+	await request(app).post('/api/v1/product/color_of_product/').set('Cookie', cookie).send({
 		product_id: productId,
 		color_id: colorId,
 		amount: amount,
 	});
 };
 
-// export const signin = async () => {
-// const userService = await UserService.getInstance();
+export const signin = async () => {
+	const email = 'test@test.com';
+	const version = 1;
+	const roll = 'admin';
+	const id_ = uuidv4();
+	await user.insert({ id: id_, version: 0, status: true, roll: 'admin', email: 'test@test.com' });
+	await user.updateRoll(email, roll, version);
+	const payload = {
+		id: id_,
+		email: 'test@test.com',
+		tell: '12345678901',
+	};
 
-// const email = 'test@test.com';
+	const token = jwt.sign(payload, process.env.JWT_KEY!);
 
-// const res = await request(app)
-// 	.post('/api/v1/auth/signup')
-// 	.send({
-// 		name: 'shahab',
-// 		family: 'asd',
-// 		tell: '01234567891',
-// 		email,
-// 		password: '123qwe',
-// 		confirmPassword: '123qwe',
-// 	})
-// 	.expect(201);
+	const session = { jwt: token };
 
-// const details = res.get('Set-Cookie');
+	const sessionJSON = JSON.stringify(session);
 
-// const user = await userService.findOne(email, '', '');
-// const otp = await userService.findOneOtp('', user.id);
+	const base64 = Buffer.from(sessionJSON).toString('base64');
 
-// const res2 = await request(app)
-// 	.post('/api/v1/auth/verify')
-// 	.set('Cookie', details)
-// 	.send({
-// 		otp: otp.otp,
-// 	})
-// 	.expect(200);
-// expect(res2.body.user).toBeDefined();
-
-// const cookie = res2.get('Set-Cookie');
-
-// return { cookie, details };
-// };
+	return [`session=${base64}`];
+};

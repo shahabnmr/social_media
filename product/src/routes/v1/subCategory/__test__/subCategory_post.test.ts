@@ -1,11 +1,13 @@
 import request from 'supertest';
 import { app } from '../../../../app';
-import { insertCategory, insertField, insertSubCategory } from '../../../../test/setup';
+import { insertCategory, insertField, insertSubCategory, signin } from '../../../../test/setup';
 
 describe('insert field', () => {
 	it('get 201 status code for insert field', async () => {
+		const cookie = await signin();
 		const result = await request(app)
 			.post('/api/v1/product/sub_category/field')
+			.set('Cookie', cookie)
 			.send({
 				name: 'ram',
 				type: 'text',
@@ -16,9 +18,24 @@ describe('insert field', () => {
 		expect(result.body.fieldId).toHaveLength(36);
 	});
 
-	it('get 400 status code for insert field without name', async () => {
+	it('get 401 status code for unauthorized', async () => {
 		const result = await request(app)
 			.post('/api/v1/product/sub_category/field')
+			.send({
+				name: 'ram',
+				type: 'text',
+				metadata: '',
+			})
+			.expect(401);
+
+		expect(result.body.errors[0].message).toEqual('Not authorized');
+	});
+
+	it('get 400 status code for insert field without name', async () => {
+		const cookie = await signin();
+		const result = await request(app)
+			.post('/api/v1/product/sub_category/field')
+			.set('Cookie', cookie)
 			.send({
 				type: 'text',
 				metadata: '',
@@ -30,12 +47,15 @@ describe('insert field', () => {
 
 describe('insert fields for subCategory', () => {
 	it('get 201 status code for insert fields for sub_category', async () => {
-		const field = await insertField('ram');
-		const field1 = await insertField('cpu');
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const cookie = await signin();
+
+		const field = await insertField('ram', cookie);
+		const field1 = await insertField('cpu', cookie);
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
 		const result = await request(app)
 			.post('/api/v1/product/sub_category/add-fields')
+			.set('Cookie', cookie)
 			.send({
 				subCategory_id: subCategory.body.subCategoryId,
 				field_ids: [field.body.fieldId, field1.body.fieldId],
@@ -46,9 +66,12 @@ describe('insert fields for subCategory', () => {
 	});
 
 	it('get 400 status code for insert fields for sub_category with incorrect subCategoryId', async () => {
-		const field = await insertField('ram');
+		const cookie = await signin();
+
+		const field = await insertField('ram', cookie);
 		const result = await request(app)
 			.post('/api/v1/product/sub_category/add-fields')
+			.set('Cookie', cookie)
 			.send({
 				subCategory_id: 'incorrect',
 				field_ids: [field.body.fieldId],
@@ -59,10 +82,13 @@ describe('insert fields for subCategory', () => {
 	});
 
 	it('get 400 status code for insert fields for sub_category with incorrect field_ids', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const cookie = await signin();
+
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
 		const result = await request(app)
 			.post('/api/v1/product/sub_category/add-fields')
+			.set('Cookie', cookie)
 			.send({
 				subCategory_id: subCategory.body.subCategoryId,
 				field_ids: ['incorrect'],
@@ -75,10 +101,13 @@ describe('insert fields for subCategory', () => {
 
 describe('insert subCategory', () => {
 	it('got 201 statusCode for insert sub_category', async () => {
-		const category = await insertCategory('electronic');
+		const cookie = await signin();
+
+		const category = await insertCategory('electronic', cookie);
 
 		return await request(app)
 			.post('/api/v1/product/sub_category')
+			.set('Cookie', cookie)
 			.send({
 				name: 'laptop',
 				category_id: category.body.categoryId,
@@ -87,8 +116,11 @@ describe('insert subCategory', () => {
 	});
 
 	it('got 400 statusCode for insert sub_category with incorrect category_id', async () => {
+		const cookie = await signin();
+
 		return await request(app)
 			.post('/api/v1/product/sub_category')
+			.set('Cookie', cookie)
 			.send({
 				name: 'laptop',
 				category_id: 'incorrect category_id',
@@ -97,10 +129,13 @@ describe('insert subCategory', () => {
 	});
 
 	it('got 400 statusCode for insert sub_category without name', async () => {
-		const category = await insertCategory('electronic');
+		const cookie = await signin();
+
+		const category = await insertCategory('electronic', cookie);
 
 		return await request(app)
 			.post('/api/v1/product/sub_category')
+			.set('Cookie', cookie)
 			.send({
 				category_id: category.body.categoryId,
 			})
@@ -108,10 +143,13 @@ describe('insert subCategory', () => {
 	});
 
 	it('got 400 statusCode for insert sub_category duplicate name', async () => {
-		const category = await insertCategory('electronic');
+		const cookie = await signin();
+
+		const category = await insertCategory('electronic', cookie);
 
 		await request(app)
 			.post('/api/v1/product/sub_category')
+			.set('Cookie', cookie)
 			.send({
 				name: 'laptop',
 				category_id: category.body.categoryId,
@@ -120,6 +158,7 @@ describe('insert subCategory', () => {
 
 		await request(app)
 			.post('/api/v1/product/sub_category')
+			.set('Cookie', cookie)
 			.send({
 				name: 'laptop',
 				category_id: category.body.categoryId,

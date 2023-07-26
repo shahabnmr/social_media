@@ -96,7 +96,6 @@ export class UserService {
 
 	async updateVersionUser(idOrEmail: string): Promise<number> {
 		const version = await this.client.query('SELECT * FROM update_version_user($1)', [idOrEmail]);
-		console.log(version.rows);
 
 		return version.rows[0].update_version_user;
 	}

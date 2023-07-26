@@ -1,7 +1,6 @@
 import { Listener, SignOutEvent, Subjects } from '@sn_common/common';
 import { Message } from 'node-nats-streaming';
 import { queueGroupName } from './queue-group-name';
-import { natsWrapper } from '../../nats-wrapper';
 import { UserService } from '../../services/db/psql/user';
 
 export class SignOutListener extends Listener<SignOutEvent> {

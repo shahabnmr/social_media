@@ -1,15 +1,17 @@
 import request from 'supertest';
 import { app } from '../../../../app';
-import { insertBrand, insertCategory, insertSubCategory } from '../../../../test/setup';
+import { insertBrand, insertCategory, insertSubCategory, signin } from '../../../../test/setup';
 
 describe('insert brand to sub_category', () => {
 	it('get 201 statusCode for insert brand to sub_category', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
-		const brand = await insertBrand('sony');
+		const cookie = await signin();
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const brand = await insertBrand('sony', cookie);
 
 		return request(app)
 			.post('/api/v1/product/brand/insert/to_sub_category/')
+			.set('Cookie', cookie)
 			.send({
 				sub_category_id: subCategory.body.subCategoryId,
 				brands: [brand.body.brandId],
@@ -18,11 +20,13 @@ describe('insert brand to sub_category', () => {
 	});
 
 	it('get 400 statusCode for insert brand with brandId incorrect', async () => {
-		const category = await insertCategory('electronic');
-		const subCategory = await insertSubCategory('laptop', category.body.categoryId);
+		const cookie = await signin();
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
 
 		const result = await request(app)
 			.post('/api/v1/product/brand/insert/to_sub_category/')
+			.set('Cookie', cookie)
 			.send({
 				sub_category_id: subCategory.body.subCategoryId,
 				brands: ['incorrect brand id'],
@@ -32,10 +36,12 @@ describe('insert brand to sub_category', () => {
 	});
 
 	it('get 400 statusCode for insert brand with sub_category_id incorrect', async () => {
-		const brand = await insertBrand('sony');
+		const cookie = await signin();
+		const brand = await insertBrand('sony', cookie);
 
 		const result = await request(app)
 			.post('/api/v1/product/brand/insert/to_sub_category/')
+			.set('Cookie', cookie)
 			.send({
 				sub_category_id: 'incorrect sub_category_id',
 				brands: [brand.body.result],
@@ -47,8 +53,10 @@ describe('insert brand to sub_category', () => {
 
 describe('insert brand', () => {
 	it('get 201 statusCode for insert brand', async () => {
+		const cookie = await signin();
 		return request(app)
 			.post('/api/v1/product/brand/insert/')
+			.set('Cookie', cookie)
 			.send({
 				name: 'sony',
 				description: 'this is sony brand',
@@ -56,9 +64,21 @@ describe('insert brand', () => {
 			.expect(201);
 	});
 
-	it('get 400 statusCode for insert brand without name', async () => {
+	it('get 401 statusCode for unauthorized', async () => {
 		return request(app)
 			.post('/api/v1/product/brand/insert/')
+			.send({
+				name: 'sony',
+				description: 'this is sony brand',
+			})
+			.expect(401);
+	});
+
+	it('get 400 statusCode for insert brand without name', async () => {
+		const cookie = await signin();
+		return request(app)
+			.post('/api/v1/product/brand/insert/')
+			.set('Cookie', cookie)
 			.send({
 				description: 'this is sony brand',
 			})
@@ -66,8 +86,10 @@ describe('insert brand', () => {
 	});
 
 	it('get 400 statusCode for insert brand without description', async () => {
+		const cookie = await signin();
 		return request(app)
 			.post('/api/v1/product/brand/insert/')
+			.set('Cookie', cookie)
 			.send({
 				name: 'sony',
 			})
@@ -75,8 +97,10 @@ describe('insert brand', () => {
 	});
 
 	it('get 400 statusCode for insert brand duplicate name', async () => {
+		const cookie = await signin();
 		await request(app)
 			.post('/api/v1/product/brand/insert/')
+			.set('Cookie', cookie)
 			.send({
 				name: 'sony',
 				description: 'this is sony brand',
@@ -85,6 +109,7 @@ describe('insert brand', () => {
 
 		await request(app)
 			.post('/api/v1/product/brand/insert/')
+			.set('Cookie', cookie)
 			.send({
 				name: 'sony',
 				description: 'this is sony brand',

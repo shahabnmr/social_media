@@ -1,16 +1,20 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
-import { BadRequestError, validateRequest } from '@sn_common/common';
+import { BadRequestError, requireAuth, validateRequest } from '@sn_common/common';
 
 import { CategoryService } from '../../../services/db/psql/category';
+import { isAdmin } from '../../../function/isAdmin';
 
 const router = express.Router();
 
 router.post(
 	'/api/v1/product/category/',
+	requireAuth,
 	[body('name').isString().isLength({ max: 20, min: 4 })],
 	validateRequest,
 	async (req: Request, res: Response) => {
+		await isAdmin(req.currentUser!.email);
+
 		const { name } = req.body;
 		const categoryService = await CategoryService.getInstance();
 

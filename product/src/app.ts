@@ -3,7 +3,7 @@ import 'express-async-errors';
 import { json } from 'body-parser';
 import cors from 'cors';
 import cookieSession from 'cookie-session';
-import { errorHandler, NotFoundError } from '@sn_common/common';
+import { currentUser, errorHandler, NotFoundError } from '@sn_common/common';
 import { rateLimit } from 'express-rate-limit';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
@@ -66,6 +66,8 @@ const connections = async () => {
 	await Dbservice.getInstance();
 };
 connections();
+
+app.use(currentUser);
 
 app.use(postBrandRouter);
 app.use(getBrandRouter);
