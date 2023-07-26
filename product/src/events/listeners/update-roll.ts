@@ -5,7 +5,7 @@ import { UserService } from '../../services/db/psql/user';
 
 export class UpdateRollLintener extends Listener<UpdateRollEvent> {
 	subject: Subjects.UpdateRoll = Subjects.UpdateRoll;
-	queueGroupName: string = queueGroupName;
+	queueGroupName = queueGroupName;
 
 	async onMessage(data: UpdateRollEvent['data'], msg: Message) {
 		const { email, roll, version } = data;

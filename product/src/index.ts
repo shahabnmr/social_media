@@ -4,6 +4,7 @@ import { natsWrapper } from './nats-wrapper';
 
 import { SignInListener } from './events/listeners/signin-listener';
 import { SignOutListener } from './events/listeners/signout-listener';
+import { UpdateRollLintener } from './events/listeners/update-roll';
 
 const start = async () => {
 	try {
@@ -22,6 +23,7 @@ const start = async () => {
 
 		new SignInListener(natsWrapper.client).listen();
 		new SignOutListener(natsWrapper.client).listen();
+		new UpdateRollLintener(natsWrapper.client).listen();
 	} catch (err) {
 		console.error(err);
 	}

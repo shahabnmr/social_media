@@ -5,6 +5,7 @@ COPY package.json .
 RUN npm update -g npm
 RUN npm cache verify
 RUN npm cache clean --force
+RUN npm config set strict-ssl false
 RUN npm install --only=prod
 COPY . .
 
