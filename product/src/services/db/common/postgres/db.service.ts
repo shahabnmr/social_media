@@ -28,13 +28,14 @@ class Dbservice {
 
 	async init() {
 		console.log('creating db service');
-			Dbservice.pool = new Pool({
-				user: this.pguser,
-				password: this.pgPassword,
-				database: this.pgDb,
-				host: this.pgHost,
-				port: this.pgPort,
-			});
+		Dbservice.pool = new Pool({
+			user: this.pguser,
+			password: this.pgPassword,
+			database: this.pgDb,
+			host: this.pgHost,
+			port: this.pgPort,
+			idleTimeoutMillis: 1000,
+		});
 	}
 
 	async getClient() {

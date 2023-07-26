@@ -17,7 +17,7 @@ router.post(
 	],
 	validateRequest,
 	async (req: Request, res: Response) => {
-		if (req.session?.details) {
+		if (req.currentUser) {
 			throw new BadRequestError('you are signed in!');
 		}
 		const { email, password } = req.body;

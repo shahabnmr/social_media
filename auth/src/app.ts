@@ -3,7 +3,7 @@ import 'express-async-errors';
 import { json } from 'body-parser';
 import cors from 'cors';
 import cookieSession from 'cookie-session';
-import { errorHandler, NotFoundError } from '@sn_common/common';
+import { currentUser, errorHandler, NotFoundError } from '@sn_common/common';
 import { rateLimit } from 'express-rate-limit';
 
 import Dbservice from './services/db/common/postgres/db.service';
@@ -17,6 +17,7 @@ import { resetPasswordRouter } from './routes/reset_password';
 import { getProfileRouter } from './routes/get_profiel';
 import { updateProfileRouter } from './routes/update_profile';
 import { resendOtp } from './routes/resend_otp';
+import { updateRollRouter } from './routes/update_roll';
 
 const app = express();
 
@@ -42,6 +43,8 @@ const connections = async () => {
 };
 connections();
 
+app.use(currentUser);
+
 app.use(signupRouter);
 app.use(currentUserRouter);
 app.use(signOutRouter);
@@ -52,6 +55,7 @@ app.use(resetPasswordRouter);
 app.use(getProfileRouter);
 app.use(updateProfileRouter);
 app.use(resendOtp);
+app.use(updateRollRouter);
 
 app.all('*', async (req, res) => {
 	throw new NotFoundError();

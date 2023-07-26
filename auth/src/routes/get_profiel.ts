@@ -1,11 +1,11 @@
 import express, { Request, Response } from 'express';
-import { BadRequestError, currentUser } from '@sn_common/common';
+import { BadRequestError, currentUser, requireAuth } from '@sn_common/common';
 
 import { UserService } from '../services/db/psql/user';
 
 const router = express.Router();
 
-router.get('/api/v1/auth/profile', currentUser, async (req: Request, res: Response) => {
+router.get('/api/v1/auth/profile', requireAuth, async (req: Request, res: Response) => {
 	const userService = await UserService.getInstance();
 
 	if (!req.currentUser) throw new BadRequestError('you must signin firstly');
@@ -21,6 +21,7 @@ router.get('/api/v1/auth/profile', currentUser, async (req: Request, res: Respon
 			tell: user.tell,
 			name: user.name,
 			family: user.family,
+			roll: user.roll,
 		},
 	});
 });

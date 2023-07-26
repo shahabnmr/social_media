@@ -1,0 +1,15 @@
+name: tests-product
+
+on:
+  pull_request:
+    paths:
+      - 'product/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run:
+          cd product && cd db && ./createTables.sh && cd .. && npm install &&
+          npm run test:ci

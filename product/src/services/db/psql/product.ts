@@ -1,9 +1,7 @@
 import Dbservice from '../common/postgres/db.service';
 import { v4 as uuidv4 } from 'uuid';
-import { DatabaseConnectionError, NotFoundError } from '@sn_common/common';
+import { DatabaseConnectionError } from '@sn_common/common';
 import { Color } from './color';
-import util from 'util';
-import { SubCategory } from './sub_category';
 
 export interface Product {
 	id?: string;
@@ -18,6 +16,14 @@ export interface Product {
 	sub_category_id: string;
 	brandId: string;
 	fields: { fieldId: string; value: string }[] | string;
+}
+
+interface Products {
+	id: string;
+	name: string;
+	images: string[];
+	brand: string;
+	price: string;
 }
 
 export class ProductService {
@@ -95,5 +101,98 @@ export class ProductService {
 		]);
 
 		return 'inserts done';
+	}
+
+	async deleteAllContent() {
+		await this.client.query('CALL deleteAllContent()');
+	}
+
+	async findAllProducts(orderName: string, sorting: string, exist: boolean): Promise<Products[]> {
+		let result: any;
+		if (exist) {
+			result = await this.client.query('SELECT * FROM findProductsExist($1,$2)', [
+				orderName,
+				sorting,
+			]);
+		} else {
+			result = await this.client.query('SELECT * FROM findProducts($1,$2)', [orderName, sorting]);
+		}
+		return result.rows;
+	}
+
+	async findProductsOfSubCategory(
+		subCategoryId: string,
+		orderName: string,
+		sorting: string,
+		exist: boolean,
+	): Promise<Products[]> {
+		let result;
+		if (exist) {
+			result = await this.client.query('SELECT * FROM findProductsOfSubCategoryExist($1,$2,$3)', [
+				subCategoryId,
+				orderName,
+				sorting,
+			]);
+		} else {
+			result = await this.client.query('SELECT * FROM findProductsOfSubCategory($1,$2,$3)', [
+				subCategoryId,
+				orderName,
+				sorting,
+			]);
+		}
+
+		return result.rows;
+	}
+
+	async findProductsOfCategory(
+		categoryId: string,
+		orderName: string,
+		sorting: string,
+		exist: boolean,
+	): Promise<Products[]> {
+		let result: any;
+		if (exist) {
+			result = await this.client.query('SELECT * FROM findProductsOfCategoryExist($1,$2,$3)', [
+				categoryId,
+				orderName,
+				sorting,
+			]);
+		} else {
+			result = await this.client.query('SELECT * FROM findProductsOfCategory($1,$2,$3)', [
+				categoryId,
+				orderName,
+				sorting,
+			]);
+		}
+
+		return result.rows;
+	}
+
+	async searchAllProducts(
+		text: string,
+		orderName: string,
+		sorting: string,
+		exist: boolean,
+	): Promise<Products[]> {
+		let result: any;
+		if (exist) {
+			result = await this.client.query('SELECT * FROM searchAllProductsExist($1,$2,$3)', [
+				text,
+				orderName,
+				sorting,
+			]);
+		} else {
+			result = await this.client.query('SELECT * FROM searchAllProducts($1,$2,$3)', [
+				text,
+				orderName,
+				sorting,
+			]);
+		}
+
+		return result.rows;
+	}
+
+	async end() {
+		await this.client.end();
 	}
 }

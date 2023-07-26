@@ -71,7 +71,7 @@ export class BrandService {
 	}
 
 	async findBrandsInSubCategory(subCategoryId: string): Promise<boolean> {
-		const result = await this.client.query('SELECT * from findOneBrandInSubCategory($1)', [
+		const result = await this.client.query('SELECT * from findBrandsInSubCategory($1)', [
 			subCategoryId,
 		]);
 
@@ -90,5 +90,9 @@ export class BrandService {
 	async checkBrands(brands: string[]): Promise<string> {
 		const result = await this.client.query('SELECT * FROM checkBrands($1)', [brands]);
 		return result.rows[0].checkbrands;
+	}
+
+	async end() {
+		await this.client.end();
 	}
 }

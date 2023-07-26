@@ -42,11 +42,23 @@ export class CategoryService {
 	async insert(name: string): Promise<string> {
 		const categoryId = uuidv4();
 		await this.client.query('CALL insert_category($1,$2)', [categoryId, name]);
+
 		return categoryId;
 	}
 
 	async findOne(id: string, name: string): Promise<Category> {
 		const category = await this.client.query('SELECT * FROM findOneCategory($1,$2)', [id, name]);
+
 		return category.rows[0];
+	}
+
+	async findAll(): Promise<Category[]> {
+		const category = await this.client.query('SELECT * FROM findCategories()', []);
+
+		return category.rows;
+	}
+
+	async end() {
+		await this.client.end();
 	}
 }

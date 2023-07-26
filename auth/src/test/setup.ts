@@ -5,9 +5,12 @@ import { UserService } from '../services/db/psql/user';
 
 jest.mock('../nats-wrapper');
 jest.setTimeout(601999);
+let userService: any;
+const email = 'test@test.com';
 
 beforeAll(async () => {
-	process.env.TZ = 'EST';
+	userService = await UserService.getInstance();
+	process.env.TZ = 'UTC';
 	process.env.NATS_CLIENT_ID = 'dsadasdasas';
 	process.env.NATS_URL = 'string';
 	process.env.NATS_CLUSTER_ID = 'string';
@@ -15,7 +18,12 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+	await userService.deleteAllContent();
 	jest.clearAllMocks();
+});
+
+afterAll(async () => {
+	await userService.end();
 });
 
 export const signin = async () => {

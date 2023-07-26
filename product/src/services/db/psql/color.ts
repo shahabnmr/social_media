@@ -80,4 +80,13 @@ export class ColorService {
 		]);
 		return color.rows[0];
 	}
+
+	async findAll(): Promise<Color[]> {
+		const color = await this.client.query('SELECT * FROM findColors()', []);
+		return color.rows;
+	}
+
+	async end() {
+		await this.client.end();
+	}
 }

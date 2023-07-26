@@ -14,14 +14,19 @@ spec:
     spec:
       containers:
         - name: product-psql
-          image: product-postgres:0.1
+          image: postgres:1.1
+          env:
+            - name: POSTGRES_PASSWORD
+              value: '123.'
+            - name: POSTGRES_DB
+              value: social_media
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
-              name: product-psql-pv-claim
+              name: product-postgres-pvc
       volumes:
-        - name: product-psql-pv-claim
+        - name: product-postgres-pvc
           persistentVolumeClaim:
-            claimName: product-psql-pv-claim
+            claimName: product-postgres-pvc
 ---
 apiVersion: v1
 kind: Service
