@@ -1,17 +1,19 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
-import { BadRequestError, validateRequest } from '@sn_common/common';
+import { BadRequestError, requireAuth, validateRequest } from '@sn_common/common';
 
 import { Product, ProductService } from '../../../services/db/psql/product';
 import { SubCategoryService } from '../../../services/db/psql/sub_category';
 import { BrandService } from '../../../services/db/psql/brand';
 import { ProductCreatedPublisher } from '../../../events/publishers/product-created-publisher';
 import { natsWrapper } from '../../../nats-wrapper';
+import { isAdmin } from '../../../function/isAdmin';
 
 const router = express.Router();
 
 router.post(
 	'/api/v1/product/',
+	requireAuth,
 	[
 		body('name').isString().isLength({ min: 5, max: 30 }).withMessage('name is not valid'),
 		body('description').isString().withMessage('description is not valid'),
@@ -34,6 +36,8 @@ router.post(
 	],
 	validateRequest,
 	async (req: Request, res: Response) => {
+		await isAdmin(req.currentUser!.email);
+
 		let product: Product = req.body;
 
 		if (req.files)

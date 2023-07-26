@@ -6,12 +6,12 @@ import { natsWrapper } from '../../nats-wrapper';
 const email = 'test@test.com';
 describe('sign out', () => {
 	it('details must be provided', async () => {
-		await request(app).post('/api/v1/auth/signout').send().expect(400);
+		await request(app).post('/api/v1/auth/signout').send().expect(401);
 	});
 
 	it('you are Not signedIn', async () => {
 		const { details } = await signin();
-		await request(app).post('/api/v1/auth/signout').set('Cookie', details).send().expect(400);
+		await request(app).post('/api/v1/auth/signout').set('Cookie', details).send().expect(401);
 	});
 
 	it('successful signout', async () => {

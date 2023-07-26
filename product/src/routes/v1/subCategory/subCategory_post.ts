@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
-import { BadRequestError, validateRequest } from '@sn_common/common';
+import { BadRequestError, requireAuth, validateRequest } from '@sn_common/common';
 import {
 	Field,
 	FieldsForSubCategory,
@@ -8,11 +8,13 @@ import {
 	SubCategoryService,
 } from '../../../services/db/psql/sub_category';
 import { CategoryService } from '../../../services/db/psql/category';
+import { isAdmin } from '../../../function/isAdmin';
 
 const router = express.Router();
 
 router.post(
 	'/api/v1/product/sub_category/field',
+	requireAuth,
 	[
 		body('name').isString().isLength({ min: 3, max: 15 }).withMessage('name is invalid'),
 		body('type').isString().isLength({ min: 3, max: 15 }).withMessage('type is invalid'),
@@ -20,6 +22,8 @@ router.post(
 	],
 	validateRequest,
 	async (req: Request, res: Response) => {
+		await isAdmin(req.currentUser!.email);
+
 		const field: Field = req.body;
 
 		const subCategoryService = await SubCategoryService.getInstance();
@@ -33,6 +37,7 @@ router.post(
 
 router.post(
 	'/api/v1/product/sub_category/add-fields',
+	requireAuth,
 	[
 		body('subCategory_id').isString().isUUID().withMessage('invalid subCategory_id'),
 		body('field_ids').isArray().withMessage('invalid field_ids'),
@@ -40,6 +45,7 @@ router.post(
 	],
 	validateRequest,
 	async (req: Request, res: Response) => {
+		await isAdmin(req.currentUser!.email);
 		const fieldsForSubCategory: FieldsForSubCategory = req.body;
 
 		const subCategoryService = await SubCategoryService.getInstance();
@@ -51,6 +57,7 @@ router.post(
 
 router.post(
 	'/api/v1/product/sub_category',
+	requireAuth,
 	[
 		body('name')
 			.isString()
@@ -63,6 +70,7 @@ router.post(
 	],
 	validateRequest,
 	async (req: Request, res: Response) => {
+		await isAdmin(req.currentUser!.email);
 		const subCategory: SubCategory = req.body;
 
 		const subCategoryService = await SubCategoryService.getInstance();

@@ -5,7 +5,7 @@ import { signin } from '../../test/setup';
 const email = 'test@test.com';
 describe('get profile', () => {
 	it('return 400, you must signed in', async () => {
-		await request(app).get('/api/v1/auth/profile').send().expect(400);
+		await request(app).get('/api/v1/auth/profile').send().expect(401);
 	});
 
 	it('get 200, get profile successful', async () => {

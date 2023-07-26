@@ -79,6 +79,15 @@ export class UserService {
 		return result.rows[0].update_user_roll;
 	}
 
+	async isAdmin(email: string): Promise<boolean> {
+		const user = await this.findOne('', email);
+		if (user.roll === 'admin') {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	async end() {
 		await this.client.end();
 	}

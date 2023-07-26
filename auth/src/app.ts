@@ -3,7 +3,7 @@ import 'express-async-errors';
 import { json } from 'body-parser';
 import cors from 'cors';
 import cookieSession from 'cookie-session';
-import { errorHandler, NotFoundError } from '@sn_common/common';
+import { currentUser, errorHandler, NotFoundError } from '@sn_common/common';
 import { rateLimit } from 'express-rate-limit';
 
 import Dbservice from './services/db/common/postgres/db.service';
@@ -42,6 +42,8 @@ const connections = async () => {
 	await Dbservice.getInstance();
 };
 connections();
+
+app.use(currentUser);
 
 app.use(signupRouter);
 app.use(currentUserRouter);
