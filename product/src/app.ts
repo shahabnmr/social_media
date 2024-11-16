@@ -28,8 +28,12 @@ const app = express();
 
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
-	max: 1000,
+	max: 200,
 	message: 'too many request from this IP, pls try again after in a few minutes ',
+	headers: true,
+	keyGenerator: (req) => {
+		return req.ip || '';
+	},
 });
 
 app.use('/images', express.static(path.join(__dirname, 'public')));

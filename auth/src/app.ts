@@ -25,18 +25,23 @@ const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
 	max: 50,
 	message: 'too many request from this IP, pls try again after in a few minutes ',
+	headers: true,
+	keyGenerator: (req) => {
+		return req.ip || '';
+	},
 });
-// app.set('trust proxy', true);
+
+app.set('trust proxy', true);
+app.use(limiter);
 app.use(json());
 app.use(cors());
 app.use(
 	cookieSession({
 		name: 'session',
 		signed: false,
-		// secure: process.env.NODE_ENV !== 'test',
+		secure: process.env.NODE_ENV !== 'test',
 	}),
 );
-app.use(limiter);
 
 const connections = async () => {
 	await Dbservice.getInstance();
