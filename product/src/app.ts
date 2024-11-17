@@ -17,6 +17,7 @@ import { getCategoryRouter } from './routes/v1/category/category_get';
 import { postCategoryRouter } from './routes/v1/category/category_post';
 import { getColorRouter } from './routes/v1/color/color_get';
 import { postColorRouter } from './routes/v1/color/color_post';
+import { deleteColorRouter } from './routes/v1/color/color_delete';
 import { getProductRouter } from './routes/v1/product/product_get';
 import { postProductRouter } from './routes/v1/product/product_post';
 import { getSubCategoryRouter } from './routes/v1/subCategory/subCategory_get';
@@ -83,6 +84,7 @@ app.use(getColorRouter);
 app.use(postColorRouter);
 app.use(postSubCategoryRouter);
 app.use(getSubCategoryRouter);
+app.use(deleteColorRouter);
 
 app.all('*', async (req, res) => {
 	throw new NotFoundError();
