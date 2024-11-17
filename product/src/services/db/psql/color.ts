@@ -86,6 +86,21 @@ export class ColorService {
 		return color.rows;
 	}
 
+	async delete(id: string): Promise<boolean> {
+		try {
+			await this.client.query('CALL delete_color($1)', [id]);
+			return true;
+		} catch (err) {
+			console.log(err);
+			return false;
+		}
+	}
+
+	async findProductsOfColors(id: string): Promise<ColorOfProduct[]> {
+		const result = await this.client.query('SELECT * FROM findProductsOfColor($1)', [id]);
+		return result.rows as ColorOfProduct[];
+	}
+
 	async end() {
 		await this.client.end();
 	}

@@ -39,3 +39,13 @@ $$
     WHERE color_id=color_id_ AND product_id=product_id_ LIMIT 1;
 $$
 language sql;
+
+CREATE OR REPLACE FUNCTION findProductsOfColor(color_id_input text)
+  RETURNS SETOF product.product_color
+AS
+$$
+    SELECT *
+	FROM product.product_color
+	WHERE color_id=color_id_input AND amount > 0;
+$$
+language sql;
