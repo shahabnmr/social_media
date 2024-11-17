@@ -36,6 +36,13 @@ AS $$
     VALUES (id_, name_, code_color_)
 $$;
 
+CREATE OR REPLACE PROCEDURE delete_color(id_ text)
+LANGUAGE SQL
+AS $$
+    DELETE FROM product.color
+	  WHERE id=id_;
+$$;
+
 CREATE OR REPLACE FUNCTION findOneColor(id_ text, name_ text, code_color_ text)
   RETURNS SETOF product.color
 AS
