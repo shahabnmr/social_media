@@ -5,6 +5,7 @@ import {
 	insertBrandToSubCategory,
 	insertCategory,
 	insertColor,
+	insertColorToProduct,
 	insertField,
 	insertFieldsSubCategory,
 	insertProduct,
@@ -93,5 +94,50 @@ describe('delete Color', () => {
 			.expect(400);
 
 		expect(result.body.errors[0].message).toEqual(`this colorId not exist: ${colorId}`);
+	});
+
+	it('get 400 Bad Request for not exist this id in product_color', async () => {
+		const cookie = await signin();
+
+		const result = await request(app)
+			.delete('/api/v1/product/colors/product_color/delete')
+			.set('Cookie', cookie)
+			.send({ product_color_id: '312321312312312312323131' })
+			.expect(400);
+	});
+
+	it('get status 200 and delete row from product_color table', async () => {
+		const cookie = await signin();
+		const color = await insertColor('blue', '#123456', cookie);
+		const category = await insertCategory('electronic', cookie);
+		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
+		const field = await insertField('ram', cookie);
+		const brand = await insertBrand('sony', cookie);
+		await insertBrandToSubCategory(subCategory.body.subCategoryId, brand.body.brandId, cookie);
+		await insertFieldsSubCategory(subCategory.body.subCategoryId, field.body.fieldId, cookie);
+		const product = await insertProduct(
+			'name 1',
+			'abcd',
+			'150',
+			subCategory.body.subCategoryId,
+			field.body.fieldId,
+			brand.body.brandId,
+			cookie,
+		);
+
+		const productColor = await insertColorToProduct(
+			product.body.product.id,
+			color.body.colorId,
+			'10',
+			cookie,
+		);
+
+		const result = await request(app)
+			.delete('/api/v1/product/colors/product_color/delete')
+			.set('Cookie', cookie)
+			.send({ product_color_id: productColor.body.id })
+			.expect(200);
+
+		expect(result.body).toEqual({ deleted: true });
 	});
 });

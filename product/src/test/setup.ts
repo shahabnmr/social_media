@@ -165,11 +165,15 @@ export const insertColorToProduct = async (
 	amount: string,
 	cookie: string[],
 ) => {
-	await request(app).post('/api/v1/product/color_of_product/').set('Cookie', cookie).send({
-		product_id: productId,
-		color_id: colorId,
-		amount: amount,
-	});
+	const result = await request(app)
+		.post('/api/v1/product/color_of_product/')
+		.set('Cookie', cookie)
+		.send({
+			product_id: productId,
+			color_id: colorId,
+			amount: amount,
+		});
+	return result;
 };
 
 export const signin = async () => {

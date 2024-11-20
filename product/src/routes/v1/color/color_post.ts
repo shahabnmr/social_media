@@ -56,7 +56,7 @@ router.post(
 
 		const result = await colorService.colorOfProduct(colorProduct);
 
-		res.status(201).send({ message: 'insert successful' });
+		res.status(201).send({ message: 'insert successful', id: result });
 	},
 );
 

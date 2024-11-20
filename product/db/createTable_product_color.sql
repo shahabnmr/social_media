@@ -40,6 +40,16 @@ $$
 $$
 language sql;
 
+CREATE OR REPLACE FUNCTION findProduct_color(product_color_id text)
+  RETURNS SETOF product.product_color
+AS
+$$
+    SELECT *
+    FROM product.product_color 
+    WHERE id=product_color_id;
+$$
+language sql;
+
 CREATE OR REPLACE FUNCTION findProductsOfColor(color_id_input text)
   RETURNS SETOF product.product_color
 AS
@@ -49,3 +59,10 @@ $$
 	WHERE color_id=color_id_input ;
 $$
 language sql;
+
+CREATE OR REPLACE PROCEDURE delete_product_color(id_ text)
+LANGUAGE SQL
+AS $$
+    DELETE FROM product.product_color
+	  WHERE id=id_;
+$$;

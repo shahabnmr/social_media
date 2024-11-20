@@ -23,10 +23,36 @@ router.delete(
 		);
 		if (colorExistForProduct.length > 0) {
 			throw new BadRequestError(
-				`this Product: ${colorExistForProduct[0].product_id} has this color: ${colorExistForProduct[0].color_id}, first delete color for this product.`
+				`this Product: ${colorExistForProduct[0].product_id} has this color: ${colorExistForProduct[0].color_id}, first delete color for this product.`,
 			);
 		}
 		const result = await colorService.delete(req.body.color_id);
+
+		res.status(200).send({ deleted: result });
+	},
+);
+
+router.delete(
+	'/api/v1/product/colors/product_color/delete',
+	requireAuth,
+	[
+		body('product_color_id')
+			.isString()
+			.isLength({ max: 36, min: 16 })
+			.withMessage('product_color_id is not valid'),
+	],
+	validateRequest,
+	async (req: Request, res: Response) => {
+		await isAdmin(req.currentUser!.email);
+
+		const colorService = await ColorService.getInstance();
+
+		const productColor = await colorService.findProduct_color(req.body.product_color_id);
+		if (productColor.length <= 0) {
+			throw new BadRequestError('Not Exist productColorId.');
+		}
+
+		const result = await colorService.delete_product_color(req.body.product_color_id);
 
 		res.status(200).send({ deleted: result });
 	},
