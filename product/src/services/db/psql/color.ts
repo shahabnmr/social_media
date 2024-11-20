@@ -96,6 +96,16 @@ export class ColorService {
 		}
 	}
 
+	async update(id: string, name: string, code_color: string): Promise<boolean> {
+		try {
+			await this.client.query('CALL update_color($1,$2,$3)', [id, name, code_color]);
+			return true;
+		} catch (err) {
+			console.error(err);
+			return false;
+		}
+	}
+
 	async findProductsOfColors(id: string): Promise<ColorOfProduct[]> {
 		const result = await this.client.query('SELECT * FROM findProductsOfColor($1)', [id]);
 		return result.rows as ColorOfProduct[];
