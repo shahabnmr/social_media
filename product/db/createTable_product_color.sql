@@ -46,6 +46,6 @@ AS
 $$
     SELECT *
 	FROM product.product_color
-	WHERE color_id=color_id_input AND amount > 0;
+	WHERE color_id=color_id_input ;
 $$
 language sql;

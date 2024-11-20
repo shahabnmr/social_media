@@ -36,6 +36,14 @@ AS $$
     VALUES (id_, name_, code_color_)
 $$;
 
+CREATE OR REPLACE PROCEDURE update_color(id_ text, name_ text, code_color_ text)
+LANGUAGE SQL
+AS $$
+    UPDATE product.color
+    SET name=name_, code_color=code_color_
+    WHERE id=id_
+$$;
+
 CREATE OR REPLACE PROCEDURE delete_color(id_ text)
 LANGUAGE SQL
 AS $$

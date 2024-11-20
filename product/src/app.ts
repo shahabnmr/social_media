@@ -22,6 +22,7 @@ import { getProductRouter } from './routes/v1/product/product_get';
 import { postProductRouter } from './routes/v1/product/product_post';
 import { getSubCategoryRouter } from './routes/v1/subCategory/subCategory_get';
 import { postSubCategoryRouter } from './routes/v1/subCategory/subCategory_post';
+import { updateColorRouter } from './routes/v1/color/color_put';
 
 import { checkFileType } from './services/multer/checkFileType';
 
@@ -85,6 +86,7 @@ app.use(postColorRouter);
 app.use(postSubCategoryRouter);
 app.use(getSubCategoryRouter);
 app.use(deleteColorRouter);
+app.use(updateColorRouter);
 
 app.all('*', async (req, res) => {
 	throw new NotFoundError();
