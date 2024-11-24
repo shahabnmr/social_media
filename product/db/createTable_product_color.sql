@@ -30,6 +30,16 @@ AS $$
     VALUES (id_, color_id_, product_id_,amount_)
 $$;
 
+CREATE OR REPLACE PROCEDURE update_product_color(
+    id_ text, color_id_ text, product_id_ text,amount_ integer
+    )
+LANGUAGE SQL
+AS $$
+    UPDATE product.product_color
+    SET color_id=color_id_, product_id=product_id_, amount=amount_
+    WHERE id=id_
+$$;
+
 CREATE OR REPLACE FUNCTION findOneColorOfProduct(color_id_ text, product_id_ text)
   RETURNS SETOF product.product_color
 AS

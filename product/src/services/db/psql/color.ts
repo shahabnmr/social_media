@@ -9,6 +9,13 @@ export interface ColorOfProduct {
 	amount: number;
 }
 
+export interface ColorOfProductUpdate {
+	id: string;
+	color_id?: string;
+	product_id?: string;
+	amount?: number;
+}
+
 export interface Color {
 	id?: string;
 	name: string;
@@ -86,7 +93,7 @@ export class ColorService {
 		return color.rows;
 	}
 
-	async findProduct_color(id: string): Promise<Color[]> {
+	async findProduct_color(id: string): Promise<ColorOfProduct[]> {
 		const color = await this.client.query('SELECT * FROM findProduct_color($1)', [id]);
 		return color.rows;
 	}
@@ -114,6 +121,26 @@ export class ColorService {
 	async update(id: string, name: string, code_color: string): Promise<boolean> {
 		try {
 			await this.client.query('CALL update_color($1,$2,$3)', [id, name, code_color]);
+			return true;
+		} catch (err) {
+			console.error(err);
+			return false;
+		}
+	}
+
+	async update_product_color(
+		id: string,
+		color_id: string,
+		product_id: string,
+		amount: number,
+	): Promise<boolean> {
+		try {
+			await this.client.query('CALL update_product_color($1,$2,$3,$4)', [
+				id,
+				color_id,
+				product_id,
+				amount,
+			]);
 			return true;
 		} catch (err) {
 			console.error(err);
