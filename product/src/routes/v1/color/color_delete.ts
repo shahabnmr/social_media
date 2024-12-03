@@ -3,7 +3,7 @@ import { ColorService } from '../../../services/db/psql/color';
 import { BadRequestError, requireAuth, validateRequest } from '@sn_common/common';
 import { body } from 'express-validator';
 import { isAdmin } from '../../../function/isAdmin';
-import { ProductDeletedPublisher } from '../../../events/publishers/product-deleted-publisher';
+import { ProductColorDeletedPublisher } from '../../../events/publishers/product-color-deleted-publisher';
 import { natsWrapper } from '../../../nats-wrapper';
 import { ProductService } from '../../../services/db/psql/product';
 
@@ -58,17 +58,18 @@ router.delete(
 
 		const result = await colorService.delete_product_color(req.body.product_color_id);
 
-		const product = await productService.findOneProduct(productColor[0].product_id, '');
-		if (!product) {
-			throw new BadRequestError(' product not Found!');
-		}
+		// const product = await productService.findOneProduct(productColor[0].product_id, '');
+		// if (!product) {
+		// 	throw new BadRequestError(' product not Found!');
+		// }
 
-		const version = await productService.updateVersion(product.id!);
+		// const version = await productService.updateVersion(product.id!);
 
-		await new ProductDeletedPublisher(natsWrapper.client).publish({
-			id: productColor[0].product_id,
-			version,
-		});
+		if (result)
+			await new ProductColorDeletedPublisher(natsWrapper.client).publish({
+				id: productColor[0].product_id,
+				version: productColor[0].version + 1,
+			});
 
 		res.status(200).send({ deleted: result });
 	},

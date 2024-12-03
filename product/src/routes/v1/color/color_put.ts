@@ -4,6 +4,8 @@ import { BadRequestError, NotFoundError, requireAuth, validateRequest } from '@s
 import { body } from 'express-validator';
 import { isAdmin } from '../../../function/isAdmin';
 import { ProductService } from '../../../services/db/psql/product';
+import { ProductColorUpdatedPublisher } from '../../../events/publishers/product-color-updated-publisher';
+import { natsWrapper } from '../../../nats-wrapper';
 
 const router = express.Router();
 router.put(
@@ -61,11 +63,15 @@ router.put(
 		await isAdmin(req.currentUser!.email);
 
 		const colorProduct: ColorOfProduct = req.body;
+		console.log(colorProduct);
+
 		const colorService = await ColorService.getInstance();
 		const productService = await ProductService.getInstance();
 
 		const checkColorProduct = await colorService.findProduct_color(colorProduct.id!);
-		if (!checkColorProduct) {
+		console.log(checkColorProduct);
+
+		if (checkColorProduct.length <= 0) {
 			throw new NotFoundError();
 		}
 
@@ -83,8 +89,17 @@ router.put(
 			colorProduct.color_id,
 			colorProduct.product_id,
 			colorProduct.amount,
+			checkColorProduct[0].version++,
 		);
 
+		if (result)
+			await new ProductColorUpdatedPublisher(natsWrapper.client).publish({
+				id: colorProduct.id!,
+				version: checkColorProduct[0].version++,
+				amount: colorProduct.amount,
+				color_id: colorProduct.color_id,
+				product_id: colorProduct.product_id,
+			});
 		res.status(200).send({ updated: result });
 	},
 );

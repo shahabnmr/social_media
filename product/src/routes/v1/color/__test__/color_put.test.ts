@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { app } from '../../../../app';
+import { natsWrapper } from '../../../../nats-wrapper';
 import {
 	insertBrand,
 	insertBrandToSubCategory,
@@ -13,8 +14,8 @@ import {
 	signin,
 } from '../../../../test/setup';
 
-describe('delete Color', () => {
-	it('get 400 status code and not delete color because color not exist', async () => {
+describe('update Color', () => {
+	it('get 400 status code and not update color because color not exist', async () => {
 		const cookie = await signin();
 
 		await request(app)
@@ -36,7 +37,7 @@ describe('delete Color', () => {
 		expect(updated.body).toEqual({ updated: true });
 	});
 
-	it('update product_color with status 200', async () => {
+	it('update product_color with status 200 and publish msg update product color', async () => {
 		const cookie = await signin();
 		const color = await insertColor('blue', '#123456', cookie);
 		const category = await insertCategory('electronic', cookie);
@@ -65,7 +66,7 @@ describe('delete Color', () => {
 			.put('/api/v1/product/colors/product_color/put')
 			.set('Cookie', cookie)
 			.send({
-				id: color.body.colorId,
+				id: productColor.body.id,
 				color_id: color.body.colorId,
 				product_id: product.body.product.id,
 				amount: '1',
@@ -73,6 +74,7 @@ describe('delete Color', () => {
 			.expect(200);
 
 		expect(updated.body).toEqual({ updated: true });
+		expect(natsWrapper.client.publish).toHaveBeenCalled();
 	});
 
 	it('status 404, not find error for product_color_id', async () => {
@@ -86,10 +88,8 @@ describe('delete Color', () => {
 				product_id: '123123weasdsdasdwqedas',
 				amount: '1',
 			})
-			.expect(400);
+			.expect(404);
 
-		expect(updated.body.errors[0].message).toEqual(
-			'this colorId not exist: 123123weasdsdasdwqedas',
-		);
+		expect(updated.body.errors[0].message).toEqual('Not found');
 	});
 });

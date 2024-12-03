@@ -31,12 +31,12 @@ AS $$
 $$;
 
 CREATE OR REPLACE PROCEDURE update_product_color(
-    id_ text, color_id_ text, product_id_ text,amount_ integer
+    id_ text, color_id_ text, product_id_ text,amount_ integer,version_ integer
     )
 LANGUAGE SQL
 AS $$
     UPDATE product.product_color
-    SET color_id=color_id_, product_id=product_id_, amount=amount_
+    SET color_id=color_id_, product_id=product_id_, amount=amount_, version=version_
     WHERE id=id_
 $$;
 
