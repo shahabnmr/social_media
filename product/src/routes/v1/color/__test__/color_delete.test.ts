@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { app } from '../../../../app';
+import { natsWrapper } from '../../../../nats-wrapper';
 import {
 	insertBrand,
 	insertBrandToSubCategory,
@@ -138,6 +139,12 @@ describe('delete Color', () => {
 			.send({ product_color_id: productColor.body.id })
 			.expect(200);
 
+		const productCheckVersion = await request(app).get(
+			`/api/v1/product/product/${product.body.product.id}`,
+		);
+
 		expect(result.body).toEqual({ deleted: true });
+		expect(natsWrapper.client.publish).toHaveBeenCalled();
+		expect(productCheckVersion.body.result.version).toEqual(1);
 	});
 });

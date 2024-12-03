@@ -157,3 +157,18 @@ BEGIN
 END;
 $$
 language plpgsql;
+
+CREATE OR REPLACE FUNCTION update_version_product(id_ text)
+RETURNS text AS
+$BODY$
+DECLARE version_ text;
+BEGIN
+	UPDATE product.product
+    SET version=version + 1
+    WHERE id=id_
+	RETURNING version INTO version_;
+	RETURN version_;
+END;
+$BODY$
+LANGUAGE plpgsql
+VOLATILE;

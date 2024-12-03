@@ -192,6 +192,11 @@ export class ProductService {
 		return result.rows;
 	}
 
+	async updateVersion(id: string): Promise<number> {
+		const version = await this.client.query('SELECT * FROM update_version_product($1)', [id]);
+		return version.rows[0].update_version_product;
+	}
+
 	async end() {
 		await this.client.end();
 	}
