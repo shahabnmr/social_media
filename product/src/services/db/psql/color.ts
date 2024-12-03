@@ -134,13 +134,15 @@ export class ColorService {
 		color_id: string,
 		product_id: string,
 		amount: number,
+		version: number,
 	): Promise<boolean> {
 		try {
-			await this.client.query('CALL update_product_color($1,$2,$3,$4)', [
+			await this.client.query('CALL update_product_color($1,$2,$3,$4,$5)', [
 				id,
 				color_id,
 				product_id,
 				amount,
+				version,
 			]);
 			return true;
 		} catch (err) {
