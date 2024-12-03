@@ -57,11 +57,12 @@ CREATE OR REPLACE FUNCTION findOneProductAllInfo(product_id_ text, name_ text)
 	  colors text,
 	  fields text,
 	  brand text,
-  	  sub_category text
+  	sub_category text,
+		version integer
   )
 AS
 $$
-SELECT id,p.name,p.description,p.price,p.images,c.colors,f.fields,b.brand,sc.sub_category
+SELECT id,p.name,p.description,p.price,p.images,c.colors,f.fields,b.brand,sc.sub_category,p.version
 FROM product.product p,
 	LATERAL (
 		SELECT json_agg(json_build_object('id',c.id,'name',c.name,'code_color',c.code_color,'amount',pc.amount)) as colors

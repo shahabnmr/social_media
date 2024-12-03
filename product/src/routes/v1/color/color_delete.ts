@@ -3,6 +3,9 @@ import { ColorService } from '../../../services/db/psql/color';
 import { BadRequestError, requireAuth, validateRequest } from '@sn_common/common';
 import { body } from 'express-validator';
 import { isAdmin } from '../../../function/isAdmin';
+import { ProductDeletedPublisher } from '../../../events/publishers/product-deleted-publisher';
+import { natsWrapper } from '../../../nats-wrapper';
+import { ProductService } from '../../../services/db/psql/product';
 
 const router = express.Router();
 router.delete(
@@ -46,6 +49,7 @@ router.delete(
 		await isAdmin(req.currentUser!.email);
 
 		const colorService = await ColorService.getInstance();
+		const productService = await ProductService.getInstance();
 
 		const productColor = await colorService.findProduct_color(req.body.product_color_id);
 		if (productColor.length <= 0) {
@@ -53,6 +57,18 @@ router.delete(
 		}
 
 		const result = await colorService.delete_product_color(req.body.product_color_id);
+
+		const product = await productService.findOneProduct(productColor[0].product_id, '');
+		if (!product) {
+			throw new BadRequestError(' product not Found!');
+		}
+
+		const version = await productService.updateVersion(product.id!);
+
+		await new ProductDeletedPublisher(natsWrapper.client).publish({
+			id: productColor[0].product_id,
+			version,
+		});
 
 		res.status(200).send({ deleted: result });
 	},
