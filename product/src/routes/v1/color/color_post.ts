@@ -5,6 +5,8 @@ import { BadRequestError, requireAuth, validateRequest } from '@sn_common/common
 import { ColorOfProduct, ColorService } from '../../../services/db/psql/color';
 import { ProductService } from '../../../services/db/psql/product';
 import { isAdmin } from '../../../function/isAdmin';
+import { ProductColorCreatedPublisher } from '../../../events/publishers/product-color-created-publisher';
+import { natsWrapper } from '../../../nats-wrapper';
 const router = express.Router();
 
 router.post(
@@ -55,6 +57,16 @@ router.post(
 		if (!product) throw new BadRequestError(`this product not exist: ${colorProduct.product_id}`);
 
 		const result = await colorService.colorOfProduct(colorProduct);
+
+		if(result) {
+			await new ProductColorCreatedPublisher(natsWrapper.client).publish({
+				id: colorProduct.id!,
+				version: 0,
+				amount: colorProduct.amount,
+				color_id: colorProduct.color_id,
+				product_id: colorProduct.product_id,
+			});
+		}
 
 		res.status(201).send({ message: 'insert successful', id: result });
 	},

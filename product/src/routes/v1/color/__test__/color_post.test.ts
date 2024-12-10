@@ -11,6 +11,7 @@ import {
 	insertSubCategory,
 	signin,
 } from '../../../../test/setup';
+import { natsWrapper } from '../../../../nats-wrapper';
 
 describe('insert color', () => {
 	it('get 201 status code for insert color', async () => {
@@ -62,7 +63,7 @@ describe('insert color', () => {
 });
 
 describe('insert_product_color', () => {
-	it('get 201 status code for insert color of product', async () => {
+	it('get 201 status code for insert color of product, and publish new data', async () => {
 		const cookie = await signin();
 		const category = await insertCategory('electronic', cookie);
 		const subCategory = await insertSubCategory('laptop', category.body.categoryId, cookie);
@@ -134,6 +135,7 @@ describe('insert_product_color', () => {
 		});
 
 		expect(result.body.message).toEqual('insert successful');
+		expect(natsWrapper.client.publish).toHaveBeenCalled();
 	});
 
 	it('get 400 status code for product not exist', async () => {
