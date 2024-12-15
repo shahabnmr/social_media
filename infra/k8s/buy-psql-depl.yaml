@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buy-psql-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: buy-psql
+  template:
+    metadata:
+      labels:
+        app: buy-psql
+    spec:
+      containers:
+        - name: buy-psql
+          image: postgres:1.1
+          env:
+            - name: POSTGRES_PASSWORD
+              value: '123.'
+            - name: POSTGRES_DB
+              value: social_media
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: buy-postgres-pvc
+      volumes:
+        - name: buy-postgres-pvc
+          persistentVolumeClaim:
+            claimName: buy-postgres-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: buy-psql-srv
+spec:
+  selector:
+    app: buy-psql
+  ports:
+    - name: db
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
